@@ -6,6 +6,6 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [react(), svgr({ svgo: false })],
   resolve: {
-    alias: { '@': path.resolve(__dirname, 'app') },
+    alias: { '@': path.resolve(__dirname, 'src') },
   },
 });

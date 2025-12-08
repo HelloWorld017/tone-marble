@@ -11,13 +11,13 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "paths": {
-      "@/*": ["./app/*"]
+      "@/*": ["./src/*"]
     },
 
     // Types
     "target": "es2022",
     "lib": ["es2022", "dom"],
-    "types": ["node"],
+    "types": ["audioworklet", "node", "vite/client"],
     "typeRoots": [
       "./node_modules",
       "./node_modules/@types"
@@ -37,8 +37,8 @@
   },
 
   "include": [
-    "app/**/*.ts",
-    "app/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "eslint.config.js",
     "vite.config.ts"
   ]
