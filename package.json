@@ -1,0 +1,36 @@
+{
+  "name": "tone-marble",
+  "version": "1.0.0",
+  "description": "An unrealistic instrument, TM-07",
+  "main": "app/index.ts",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint"
+  },
+  "author": "nenw* <khi@nenw.dev>",
+  "license": "MIT",
+  "packageManager": "pnpm@10.18.3",
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@stylistic/eslint-plugin": "^5.6.1",
+    "@svgr/rollup": "^8.1.0",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@vitejs/plugin-react-swc": "^4.2.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import-x": "^4.16.1",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.1",
+    "vite": "^7.2.7"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^8.40.1",
+    "@dimforge/rapier3d": "^0.19.3",
+    "eslint": "^9.39.1",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
+  }
+}
