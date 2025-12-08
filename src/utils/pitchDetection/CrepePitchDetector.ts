@@ -7,37 +7,55 @@ export interface PitchResult {
   confidence: number;
 }
 
+const postprocess = (activations: Float32Array | Int32Array | Uint8Array) => {
+  let maxVal = -Infinity;
+  let maxIdx = -1;
+  for (let i = 0; i < activations.length; i++) {
+    if (activations[i] > maxVal) {
+      maxVal = activations[i];
+      maxIdx = i;
+    }
+  }
+
+  let cent = 0;
+  const CENTS_SCALE = 20;
+  const CENTS_OFFSET = 1997.3794084376191;
+  cent = CENTS_SCALE * maxIdx + CENTS_OFFSET;
+
+  const pitch = 10 * Math.pow(2, cent / 1200);
+  const confidence = maxVal;
+  return { pitch, confidence };
+};
+
 export class CrepePitchDetector {
   private audioContext: AudioContext;
   private model: tf.LayersModel | null = null;
   private workletNode: AudioWorkletNode | null = null;
   private isReady: boolean = false;
 
-  public onPitchDetected: ((result: PitchResult) => void) | null = null;
+  public callback: ((result: PitchResult) => void) | null = null;
 
-  constructor() {
-    this.audioContext = new AudioContext({ sampleRate: 16000 });
+  constructor(ctx: AudioContext, callback: (result: PitchResult) => void) {
+    this.audioContext = ctx;
+    this.callback = callback;
   }
 
   async init() {
-    this.model = await tf.loadLayersModel('/assets/neuralnets/crepe/model.json');
-    await this.audioContext.audioWorklet.addModule(pitchProcessorWorklet);
+    const audioWorkletPromise = this.audioContext.audioWorklet.addModule(pitchProcessorWorklet);
+    const modelPromise = tf
+      .ready()
+      .then(() => tf.loadLayersModel('/assets/neuralnets/crepe/model.json'));
 
+    [this.model] = await Promise.all([modelPromise, audioWorkletPromise]);
     this.isReady = true;
   }
 
-  async loadAudioFile(url: string): Promise<AudioBuffer> {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    return await this.audioContext.decodeAudioData(arrayBuffer);
-  }
-
-  async start(audioUrl: string) {
+  async start(audio: ArrayBuffer) {
     if (!this.isReady) {
-      throw new Error('Not initialized!');
+      await this.init();
     }
 
-    const audioBuffer = await this.loadAudioFile(audioUrl);
+    const audioBuffer = await this.audioContext.decodeAudioData(audio);
     const source = this.audioContext.createBufferSource();
     source.buffer = audioBuffer;
 
@@ -47,10 +65,11 @@ export class CrepePitchDetector {
       this.predict(audioData);
     };
 
-    source.connect(this.workletNode);
     this.workletNode.connect(this.audioContext.destination);
-
+    source.connect(this.workletNode);
     source.start();
+
+    return source;
   }
 
   private predict(audioData: Float32Array) {
@@ -62,33 +81,9 @@ export class CrepePitchDetector {
       const inputTensor = tf.tensor(audioData).reshape([1, 1024]);
       const output = this.model!.predict(inputTensor) as tf.Tensor;
       const activations = output.dataSync();
-      return this.processCrepeOutput(activations);
+      return postprocess(activations);
     });
 
-    if (this.onPitchDetected) {
-      this.onPitchDetected({ ...result });
-    }
-  }
-
-  private processCrepeOutput(activations: Float32Array | Int32Array | Uint8Array) {
-    let maxVal = -Infinity;
-    let maxIdx = -1;
-    for (let i = 0; i < activations.length; i++) {
-      if (activations[i] > maxVal) {
-        maxVal = activations[i];
-        maxIdx = i;
-      }
-    }
-
-    const confidence = maxVal;
-
-    let cent = 0;
-    const CENTS_SCALE = 20;
-    const CENTS_OFFSET = 1997.3794084376191;
-    cent = CENTS_SCALE * maxIdx + CENTS_OFFSET;
-
-    const frequency = 10 * Math.pow(2, cent / 1200);
-
-    return { pitch: frequency, confidence };
+    this.callback?.(result);
   }
 }
