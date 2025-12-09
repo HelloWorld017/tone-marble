@@ -10,23 +10,16 @@ window.addEventListener('click', async () => {
   const ctx = new AudioContext();
   const oscillator = ctx.createOscillator();
   const gain = ctx.createGain();
-  const movingWindow: [number, number][] = [];
   const pitchDet = new CrepePitchDetector(ctx, ({ pitch, confidence }) => {
-    movingWindow.push([pitch, confidence]);
-    if (movingWindow.length > 40) {
-      movingWindow.unshift();
-    }
+    /* if (confidence < 0.9) {
+      gain.gain.value = 0;
+      return;
+    } */
 
-    const { sum, cnt } = movingWindow.reduce(
-      ({ sum, cnt }, [pitch, confidence]) => ({
-        sum: sum + pitch * confidence,
-        cnt: cnt + confidence,
-      }),
-      { sum: 0, cnt: 0 }
-    );
+    const confidenceSigmoid = (Math.tanh(confidence * 100 - 20) + 1) / 2;
 
-    oscillator.frequency.value = sum / cnt;
-    gain.gain.value = cnt / 70;
+    oscillator.frequency.value = pitch * 2;
+    gain.gain.value = confidenceSigmoid * 0.8;
   });
 
   oscillator.frequency.value = 440;
@@ -34,5 +27,10 @@ window.addEventListener('click', async () => {
   oscillator.start();
   gain.connect(ctx.destination);
   await pitchDet.init();
-  void pitchDet.start(await fetch('/puzzle-girl.mp3').then(res => res.arrayBuffer()));
+
+  const stream = await navigator.mediaDevices
+    .getUserMedia({ audio: true })
+    .catch(() => alert('Please allow microphone!'));
+
+  void pitchDet.start(ctx.createMediaStreamSource(stream as MediaStream));
 });

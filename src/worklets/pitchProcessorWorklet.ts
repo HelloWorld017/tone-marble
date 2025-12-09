@@ -47,9 +47,10 @@ class PitchProcessor extends AudioWorkletProcessor {
     }
 
     this.phase = this.phase - inputChannel.length;
+    this.lastInputSample = inputChannel[inputChannel.length - 1];
 
     const output = outputs[0];
-    // output.forEach((channel, index) => channel.set(input[index]));
+    output.forEach((channel, index) => channel.set(input[index]));
     return true;
   }
 
