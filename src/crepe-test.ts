@@ -1,4 +1,4 @@
-import { CrepePitchDetector } from './utils/pitchDetection/CrepePitchDetector';
+import { PitchDetectorNeural } from './utils/pitchDetector/PitchDetectorNeural';
 
 let isLoaded = false;
 window.addEventListener('click', async () => {
@@ -10,7 +10,7 @@ window.addEventListener('click', async () => {
   const ctx = new AudioContext();
   const oscillator = ctx.createOscillator();
   const gain = ctx.createGain();
-  const pitchDet = new CrepePitchDetector(ctx, ({ pitch, confidence }) => {
+  const pitchDet = new PitchDetectorNeural(ctx, ({ pitch, confidence }) => {
     /* if (confidence < 0.9) {
       gain.gain.value = 0;
       return;
@@ -26,7 +26,7 @@ window.addEventListener('click', async () => {
   oscillator.connect(gain);
   oscillator.start();
   gain.connect(ctx.destination);
-  await pitchDet.init();
+  await pitchDet.init('crepe');
 
   const stream = await navigator.mediaDevices
     .getUserMedia({ audio: true })

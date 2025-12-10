@@ -18,7 +18,9 @@
     "@types/audioworklet": "^0.0.92",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react-swc": "^4.2.2",
+    "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import-x": "^4.16.1",
@@ -29,12 +31,15 @@
     "vite": "^7.2.7"
   },
   "dependencies": {
-    "@babylonjs/core": "^8.40.1",
-    "@dimforge/rapier3d": "^0.19.3",
+    "@emotion/react": "^11.14.0",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.2",
+    "@react-three/rapier": "^2.2.0",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-backend-webgpu": "^4.22.0",
-    "eslint": "^9.39.1",
+    "@types/three": "^0.181.0",
     "react": "^19.2.1",
-    "react-dom": "^19.2.1"
+    "react-dom": "^19.2.1",
+    "three": "^0.181.2"
   }
 }

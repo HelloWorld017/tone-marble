@@ -1,11 +1,15 @@
 import * as tf from '@tensorflow/tfjs';
-import pitchProcessorWorklet from '@/worklets/pitchProcessorWorklet?url';
+import sampleProcessorWorklet from './worklet?url';
 import '@tensorflow/tfjs-backend-webgpu';
 
+export type PitchModelKind = 'crepe' | 'spice';
 export interface PitchResult {
   pitch: number;
   confidence: number;
 }
+
+const CENTS_SCALE = 20;
+const CENTS_OFFSET = 1997.3794084376191;
 
 const postprocessCrepe = (activations: Float32Array | Int32Array | Uint8Array) => {
   let maxVal = -Infinity;
@@ -17,8 +21,6 @@ const postprocessCrepe = (activations: Float32Array | Int32Array | Uint8Array) =
     }
   }
 
-  const CENTS_SCALE = 20;
-  const CENTS_OFFSET = 1997.3794084376191;
   let adjustment = 0;
 
   if (maxIdx > 0 && maxIdx < activations.length - 1) {
@@ -33,28 +35,29 @@ const postprocessCrepe = (activations: Float32Array | Int32Array | Uint8Array) =
   return { pitch, confidence };
 };
 
+const PT_OFFSET = 25.58;
+const PT_SLOPE = 63.07;
+const FMIN = 10;
+const BINS_PER_OCTAVE = 12;
+
 const postprocessSpice = (activations: [Float32Array, Float32Array]) => {
   const pitchSum = activations[0].reduce<number>((a, b) => a + b, 0);
   const uncertaintySum = activations[1].reduce<number>((a, b) => a + b, 0);
   const pitchRaw = pitchSum / activations[0].length;
   const uncertainty = uncertaintySum / activations[1].length;
 
-  const PT_OFFSET = 25.58;
-  const PT_SLOPE = 63.07;
-  const FMIN = 10;
-  const BINS_PER_OCTAVE = 12;
   const cqtBin = pitchRaw * PT_SLOPE + PT_OFFSET;
   const pitch = FMIN * 2 ** (cqtBin / BINS_PER_OCTAVE);
   const confidence = 1.0 - uncertainty;
   return { pitch, confidence };
 };
 
-export class CrepePitchDetector {
+export class PitchDetectorNeural {
   private audioContext: AudioContext;
   private model: tf.LayersModel | tf.GraphModel | null = null;
   private workletNode: AudioWorkletNode | null = null;
   private isReady: boolean = false;
-  private modelKind: 'crepe' | 'spice' = 'crepe';
+  private modelKind: PitchModelKind = 'crepe';
 
   public callback: ((result: PitchResult) => void) | null = null;
 
@@ -63,24 +66,25 @@ export class CrepePitchDetector {
     this.callback = callback;
   }
 
-  async init() {
-    const audioWorkletPromise = this.audioContext.audioWorklet.addModule(pitchProcessorWorklet);
+  async init(modelKind: PitchModelKind) {
+    const audioWorkletPromise = this.audioContext.audioWorklet.addModule(sampleProcessorWorklet);
     const modelPromise = tf
       .ready()
       .then(
         (): Promise<tf.LayersModel | tf.GraphModel> =>
-          this.modelKind === 'spice'
+          modelKind === 'spice'
             ? tf.loadGraphModel('/assets/neuralnets/spice/model.json')
             : tf.loadLayersModel('/assets/neuralnets/crepe/model.json')
       );
 
     [this.model] = await Promise.all([modelPromise, audioWorkletPromise]);
+    this.modelKind = modelKind;
     this.isReady = true;
   }
 
-  async start(audio: AudioBufferSourceNode | MediaStreamAudioSourceNode) {
+  start(audio: AudioBufferSourceNode | MediaStreamAudioSourceNode) {
     if (!this.isReady) {
-      await this.init();
+      throw new Error('PitchDetector not ready');
     }
 
     this.workletNode = new AudioWorkletNode(this.audioContext, 'pitch-processor');

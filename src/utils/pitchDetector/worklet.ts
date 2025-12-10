@@ -2,7 +2,7 @@ const TARGET_SAMPLE_RATE = 16000;
 const BUFFER_SIZE = 1024;
 const OVERLAP_SIZE = 256;
 
-class PitchProcessor extends AudioWorkletProcessor {
+class SampleProcessor extends AudioWorkletProcessor {
   private buffer: Float32Array;
   private samplesWritten: number = 0;
   private phase: number = 0;
@@ -68,4 +68,4 @@ class PitchProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor('pitch-processor', PitchProcessor);
+registerProcessor('sample-processor', SampleProcessor);
