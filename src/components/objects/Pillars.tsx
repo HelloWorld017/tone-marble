@@ -49,7 +49,7 @@ export const Pillars = ({
     <>
       <Instances>
         <cylinderGeometry args={[PILLAR_RADIUS, PILLAR_RADIUS, PILLAR_HEIGHT, PILLAR_SEGMENTS]} />
-        <meshStandardMaterial color="#888" />
+        <meshPhysicalMaterial transparent transmission={0.7} opacity={0.7} color="#f0f0f0" />
         {pillars.map(data => (
           <Instance key={data.key} position={data.position} rotation={data.rotation} />
         ))}

@@ -40,7 +40,7 @@ const Effects = () => (
 export const Scene = () => (
   <div style={{ width: '100vw', height: '100vh' }}>
     <Canvas shadows camera={{ position: [0, 0, 30], fov: 50 }} flat>
-      <color attach="background" args={['#111']} />
+      <color attach="background" args={['#c0c0c0']} />
       <SceneLight />
       <SceneObjects />
       <OrbitControls target={[0, 0, 0]} />

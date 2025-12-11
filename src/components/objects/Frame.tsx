@@ -28,7 +28,7 @@ export const Frame = ({
           rotation={[0, 0, planeAngle]}
         >
           <boxGeometry args={[planeHeight - holeHeight, 0.2, planeWidth]} />
-          <meshStandardMaterial color="#333" />
+          <meshPhysicalMaterial transparent transmission={0.9} opacity={0.9} color="#f0f0f0" />
         </mesh>
       </RigidBody>
 
