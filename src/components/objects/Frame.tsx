@@ -17,7 +17,7 @@ export const Frame = ({
   holeHeight = 2,
   height,
 }: FrameProps) => {
-  const wallY = (Math.tan(planeAngle) * (planeHeight / 2) + height) / 2;
+  const wallY = (Math.tan(planeAngle) * (planeHeight / 2)) / 2;
 
   return (
     <>
