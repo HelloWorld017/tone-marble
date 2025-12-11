@@ -9,7 +9,14 @@ import * as ts from 'typescript-eslint';
 
 const config = defineConfig(
   {
-    files: ['src/**/*.ts', 'src/**/*.tsx', 'eslint.config.js', 'vite.config.ts'],
+    files: [
+      'src/**/*.tsx',
+      'src/**/*.ts',
+      'examples/**/*.tsx',
+      'examples/**/*.ts',
+      'eslint.config.js',
+      'vite.config.ts',
+    ],
     extends: [
       js.configs.recommended,
       ...ts.configs.recommendedTypeChecked,
