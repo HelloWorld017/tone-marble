@@ -21,45 +21,52 @@ import {
   useAudioContext,
 } from './audio/AudioContextProvider';
 import { SynthesizeProvider, useSynthesize } from './audio/SynthesizeProvider';
+import { useFluorescentBlink } from './hooks/useFluorescentBlink';
 import { Case } from './objects/Case';
 import { Frame } from './objects/Frame';
 import { Marbles } from './objects/Marbles';
 import { Pillars } from './objects/Pillars';
 
-const SceneLight = () => (
-  <>
-    <directionalLight
-      position={[10, 10, 10]}
-      intensity={0.2}
-      castShadow
-      shadow-mapSize={[2048, 2048]}
-    />
-    <Environment preset="city" environmentIntensity={0.3} />
-  </>
-);
+const SceneEnvironment = () => {
+  const isPoweredOn = useInterfaceState(state => state.isPoweredOn);
+  const intensity = useFluorescentBlink(isPoweredOn);
+  return (
+    <>
+      <directionalLight
+        position={[10, 10, 10]}
+        intensity={intensity * 0.2}
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+      />
+      <Environment preset="city" environmentIntensity={intensity * 0.3} />
+      <Clouds material={MeshBasicMaterial}>
+        <Cloud
+          seed={1}
+          segments={15}
+          volume={3}
+          bounds={[2, 0.3, 2]}
+          position={[-12, 5, 0]}
+          color="white"
+          opacity={intensity}
+        />
+        <Cloud
+          seed={2}
+          segments={24}
+          volume={10}
+          bounds={[2, 1, 4.5]}
+          position={[15, -2, 0]}
+          color="white"
+          opacity={intensity}
+        />
+        <pointLight position={[-12, 4, 0]} color="blue" intensity={intensity * 20} />
+      </Clouds>
+    </>
+  );
+};
 
 const SceneObjects = () => (
   <>
     <Case />
-    <Clouds material={MeshBasicMaterial}>
-      <Cloud
-        seed={1}
-        segments={15}
-        volume={3}
-        bounds={[2, 0.3, 2]}
-        position={[-12, 5, 0]}
-        color="white"
-      />
-      <Cloud
-        seed={2}
-        segments={24}
-        volume={10}
-        bounds={[2, 1, 4.5]}
-        position={[15, -2, 0]}
-        color="white"
-      />
-      <pointLight position={[-12, 4, 0]} color="blue" intensity={20} />
-    </Clouds>
     <Physics gravity={[0, -20, 0]} interpolate={false}>
       <Frame planeWidth={10} planeHeight={32} planeAngle={-5 * (Math.PI / 180)} height={20} />
       <Pillars planeAngle={-5 * (Math.PI / 180)} rows={20} columns={6} />
@@ -133,9 +140,9 @@ export const Scene = () => (
             <Suspense fallback={<SceneProgress />}>
               <color attach="background" args={['#c0c0c0']} />
               <SceneAudioListener />
-              <SceneLight />
-              <SceneObjects />
               <SceneEffects />
+              <SceneEnvironment />
+              <SceneObjects />
               <SceneOrbitControls />
             </Suspense>
           </Canvas>

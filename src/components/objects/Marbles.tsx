@@ -1,8 +1,9 @@
 import { useFrame } from '@react-three/fiber';
 import { InstancedRigidBodies, type RapierRigidBody } from '@react-three/rapier';
-import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react';
+import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Matrix4, Vector3 } from 'three';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
+import { useInterfaceState } from '../InterfaceStateProvider';
 import type { Ref } from 'react';
 import type { InstancedMesh } from 'three';
 
@@ -10,7 +11,7 @@ const MARBLES_SEGMENT = 16;
 const HOLD_POS = new Vector3(0, -100, 0);
 const HOLD_MATRIX = new Matrix4().makeScale(0, 0, 0).setPosition(HOLD_POS);
 
-export type MarblesHandle = { spawn: () => void };
+export type MarblesHandle = { spawnMarble: () => void };
 export type MarblesProps = {
   ref?: Ref<MarblesHandle>;
   count?: number;
@@ -39,6 +40,18 @@ export const Marbles = ({
   ],
   automatic = true,
 }: MarblesProps) => {
+  const isPoweredOn = useInterfaceState(state => state.isPoweredOn);
+  const [isReadyToSpawn, setIsReadyToSpawn] = useState(false);
+  useEffect(() => {
+    if (!isPoweredOn) {
+      setIsReadyToSpawn(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => setIsReadyToSpawn(true), 3000);
+    return () => clearTimeout(timeoutId);
+  }, [isPoweredOn]);
+
   const spawnIndex = useRef(0);
   const bodiesRef = useRef<RapierRigidBody[]>(null);
   const meshRef = useRef<InstancedMesh>(null);
@@ -53,6 +66,10 @@ export const Marbles = ({
     const body = bodiesRef.current?.[index];
     if (!body || !meshRef.current) {
       throw new Error('Marble does not exist!');
+    }
+
+    if (body.isSleeping()) {
+      return;
     }
 
     body.setTranslation(HOLD_POS, false);
@@ -86,8 +103,8 @@ export const Marbles = ({
   }, [count]);
 
   // Spawn Logic
-  const spawn = useLatestCallback(() => {
-    if (!meshRef.current || !bodiesRef.current) {
+  const spawnMarble = useLatestCallback(() => {
+    if (!meshRef.current || !bodiesRef.current || !isReadyToSpawn) {
       return;
     }
 
@@ -127,13 +144,13 @@ export const Marbles = ({
         return;
       }
 
-      spawn();
+      spawnMarble();
     }, 100);
 
     return () => clearInterval(intervalId);
-  }, [automatic, spawn]);
+  }, [automatic, isPoweredOn, spawnMarble]);
 
-  useImperativeHandle(ref, () => ({ spawn }));
+  useImperativeHandle(ref, () => ({ spawnMarble }));
 
   // Despawn Logic
   useFrame(() => {
@@ -159,6 +176,14 @@ export const Marbles = ({
       }
     });
   });
+
+  useEffect(() => {
+    if (!isPoweredOn) {
+      for (let i = 0; i < count; i++) {
+        despawnMarble(i);
+      }
+    }
+  }, [isPoweredOn, count]);
 
   return (
     <InstancedRigidBodies

@@ -3,9 +3,9 @@ import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
 import type { CSSProperties } from 'react';
 
-type InterfaceKind = 'click' | 'xy' | 'x';
+export type InterfaceKind = 'click' | 'xy' | 'x';
 
-export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
+const useInterfaceKindCursor = (hoverTarget: string | null, activeTarget: string | null) => {
   const interfaceKinds = useRef<Record<string, InterfaceKind>>({});
   const updateInterfaceKind = useLatestCallback((id: string, kind: InterfaceKind) => {
     interfaceKinds.current[id] = kind;
@@ -13,16 +13,6 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
       delete interfaceKinds.current[id];
     };
   });
-
-  const [isSandActive, setIsSandActive] = useState(true);
-  const [isGlassActive, setIsGlassActive] = useState(true);
-  const [isMetalActive, setIsMetalActive] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
-  const [hoverTarget, setHoverTarget] = useState<string | null>(null);
-  const [activeTarget, setActiveTarget] = useState<string | null>(null);
-  const [wave, setWave] = useState(0);
-  const [radius, setRadius] = useState(0);
-  const [volume, setVolume] = useState(1);
 
   useEffect(() => {
     const nextCursor = ((): NonNullable<CSSProperties['cursor']> => {
@@ -48,6 +38,23 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
     };
   }, [activeTarget, hoverTarget]);
 
+  return { updateInterfaceKind };
+};
+
+export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
+  const [hoverTarget, setHoverTarget] = useState<string | null>(null);
+  const [activeTarget, setActiveTarget] = useState<string | null>(null);
+  const { updateInterfaceKind } = useInterfaceKindCursor(hoverTarget, activeTarget);
+
+  const [isSandActive, setIsSandActive] = useState(true);
+  const [isGlassActive, setIsGlassActive] = useState(true);
+  const [isMetalActive, setIsMetalActive] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isPoweredOn, setIsPoweredOn] = useState(false);
+  const [wave, setWave] = useState(0);
+  const [radius, setRadius] = useState(0);
+  const [volume, setVolume] = useState(1);
+
   return {
     // Cursor Management
     hoverTarget,
@@ -57,14 +64,16 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
     updateInterfaceKind,
 
     // Buttons
-    isSandActive,
-    isGlassActive,
-    isMetalActive,
+    isSandActive: isPoweredOn && isSandActive,
+    isGlassActive: isPoweredOn && isGlassActive,
+    isMetalActive: isPoweredOn && isMetalActive,
     isMuted,
+    isPoweredOn,
     setIsSandActive,
     setIsGlassActive,
     setIsMetalActive,
     setIsMuted,
+    setIsPoweredOn,
 
     // Knobs
     wave,

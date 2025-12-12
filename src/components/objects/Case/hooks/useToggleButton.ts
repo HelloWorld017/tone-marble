@@ -1,8 +1,11 @@
 import { useSpring } from '@react-spring/three';
-import { useId, useMemo, useState } from 'react';
-import { useInterfaceState } from '@/components/InterfaceStateProvider';
-import type { PointerEvent } from 'react';
-import type { Object3D } from 'three';
+import { useLoader } from '@react-three/fiber';
+import { useMemo, useState } from 'react';
+import { AudioLoader, type Object3D } from 'three';
+import ToggleTickSound from '@/assets/audio/toggle-tick.mp3';
+import ToggleTockSound from '@/assets/audio/toggle-tock.mp3';
+import { useSynthesize } from '@/components/audio/SynthesizeProvider';
+import { useHover } from './useHover';
 
 type UseToggleButtonProps = {
   bone: Object3D;
@@ -19,26 +22,26 @@ export const useToggleButton = ({
   baseZ = 0,
   toggleByBone = false,
 }: UseToggleButtonProps) => {
-  const id = useId();
-  const hoverTarget = useInterfaceState(state => state.hoverTarget);
-  const activeTarget = useInterfaceState(state => state.activeTarget);
-  const setHoverTarget = useInterfaceState(state => state.setHoverTarget);
-  const setActiveTarget = useInterfaceState(state => state.setActiveTarget);
+  const playAudio = useSynthesize(state => state.playAudio);
+  const toggleTickSoundBuffer = useLoader(AudioLoader, ToggleTickSound);
+  const toggleTockSoundBuffer = useLoader(AudioLoader, ToggleTockSound);
+
+  const { isActive, groupProps } = useHover({
+    onPointerDown: () => playAudio(bone.position.toArray(), toggleTickSoundBuffer),
+    onPointerUpActive: () => {
+      onChange(!state);
+      playAudio(bone.position.toArray(), toggleTockSoundBuffer);
+    },
+  });
 
   const [initialZ] = useState(() => bone.position.z);
-
   const boneZOffset = useMemo(() => {
-    const isActive = activeTarget === id;
-    if (toggleByBone) {
-      if (isActive) {
-        return 0.5;
-      }
-
-      return state ? 0.3 : baseZ;
+    if (!toggleByBone) {
+      return isActive ? 0.5 : baseZ;
     }
 
-    return isActive ? 0.5 : baseZ;
-  }, [activeTarget, state, toggleByBone]);
+    return isActive ? 0.5 : state ? 0.3 : baseZ;
+  }, [isActive, state, toggleByBone]);
 
   const { boneZ } = useSpring({
     boneZ: initialZ + boneZOffset,
@@ -50,42 +53,12 @@ export const useToggleButton = ({
     config: { duration: 200 },
   });
 
-  const onPointerDown = (event: PointerEvent) => {
-    event.stopPropagation();
-    (event.target as Element).setPointerCapture(event.pointerId);
-    setActiveTarget(id);
-  };
-
-  const onPointerUp = (event: PointerEvent) => {
-    event.stopPropagation();
-    (event.target as Element).releasePointerCapture(event.pointerId);
-
-    if (activeTarget === id) {
-      setActiveTarget(null);
-      onChange(!state);
-    }
-  };
-
-  const onPointerEnter = (event: PointerEvent) => {
-    event.stopPropagation();
-    setHoverTarget(id);
-  };
-
-  const onPointerLeave = (event: PointerEvent) => {
-    event.stopPropagation();
-
-    if (hoverTarget === id) {
-      setHoverTarget(null);
-    }
-
-    if (activeTarget === id) {
-      setActiveTarget(null);
-    }
-  };
-
   return {
-    groupProps: { onPointerDown, onPointerUp, onPointerEnter, onPointerLeave },
+    groupProps,
     boneZ,
     lightIntensity,
   };
 };
+
+useLoader.preload(AudioLoader, ToggleTickSound);
+useLoader.preload(AudioLoader, ToggleTockSound);

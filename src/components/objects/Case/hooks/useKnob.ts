@@ -1,10 +1,10 @@
 import { useSpring } from '@react-spring/three';
 import { throttle } from 'es-toolkit';
-import { useEffect, useId, useMemo, useRef } from 'react';
-import { useInterfaceState } from '@/components/InterfaceStateProvider';
+import { useMemo, useRef } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
+import { useHover } from './useHover';
 
-const MAX_BLEND_DISTANCE = 50;
+const MAX_BLEND_DISTANCE = 5;
 
 type UseKnobProps = {
   state: number;
@@ -12,15 +12,6 @@ type UseKnobProps = {
 };
 
 export const useKnob = ({ state, onChange }: UseKnobProps) => {
-  const id = useId();
-  const updateInterfaceKind = useInterfaceState(state => state.updateInterfaceKind);
-  useEffect(() => updateInterfaceKind(id, 'xy'), [id]);
-
-  const hoverTarget = useInterfaceState(state => state.hoverTarget);
-  const activeTarget = useInterfaceState(state => state.activeTarget);
-  const setHoverTarget = useInterfaceState(state => state.setHoverTarget);
-  const setActiveTarget = useInterfaceState(state => state.setActiveTarget);
-
   const onChangeLatest = useLatestCallback(onChange);
   const onChangeThrottled = useMemo(() => throttle(onChangeLatest, 150), [onChange]);
   const { boneRotate } = useSpring({
@@ -28,24 +19,15 @@ export const useKnob = ({ state, onChange }: UseKnobProps) => {
   });
 
   const initialState = useRef({ x: 0, y: 0, rotate: boneRotate.get() });
-  const onPointerDown = (event: PointerEvent) => {
-    event.stopPropagation();
-    (event.target as Element).setPointerCapture(event.pointerId);
-    initialState.current = { x: event.clientX, y: event.clientY, rotate: boneRotate.get() };
-    setActiveTarget(id);
-  };
-
-  const onPointerUp = (event: PointerEvent) => {
-    event.stopPropagation();
-    (event.target as Element).releasePointerCapture(event.pointerId);
-
-    if (activeTarget === id) {
-      setActiveTarget(null);
-    }
-  };
+  const { isActive, groupProps } = useHover({
+    interfaceKind: 'xy',
+    onPointerDown: event => {
+      initialState.current = { x: event.clientX, y: event.clientY, rotate: boneRotate.get() };
+    },
+  });
 
   const onPointerMove = (event: PointerEvent) => {
-    if (activeTarget !== id) {
+    if (!isActive) {
       return;
     }
 
@@ -67,22 +49,8 @@ export const useKnob = ({ state, onChange }: UseKnobProps) => {
     boneRotate.start(nextRotation).catch(() => {});
   };
 
-  const onPointerEnter = () => {
-    setHoverTarget(id);
-  };
-
-  const onPointerLeave = () => {
-    if (hoverTarget === id) {
-      setHoverTarget(null);
-    }
-
-    if (activeTarget === id) {
-      setActiveTarget(null);
-    }
-  };
-
   return {
     boneRotate,
-    groupProps: { onPointerDown, onPointerUp, onPointerMove, onPointerEnter, onPointerLeave },
+    groupProps: { ...groupProps, onPointerMove },
   };
 };

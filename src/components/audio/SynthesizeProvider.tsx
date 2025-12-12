@@ -198,6 +198,34 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     };
   });
 
+  const playAudio = useLatestCallback((audio: AudioBuffer, position?: Position) => {
+    if (!ctx || !masterCompressor) {
+      return;
+    }
+
+    const t = ctx.currentTime;
+    const source = ctx.createBufferSource();
+    let target: AudioNode = masterCompressor;
+
+    if (position) {
+      const panner = ctx.createPanner();
+      updatePannerForPosition(panner, position);
+      panner.connect(target);
+      target = panner;
+    }
+
+    source.buffer = audio;
+    source.connect(target);
+
+    source.start(t);
+    source.onended = () => {
+      source.disconnect();
+      if (position) {
+        target.disconnect();
+      }
+    };
+  });
+
   return {
     analyzerOut,
     destinationOut,
@@ -205,5 +233,6 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     updateListenerPosition,
     synthesizeSine,
     synthesizeNoise,
+    playAudio,
   };
 });

@@ -55,3 +55,5 @@ export const useLightMap = (
     });
   }, []);
 };
+
+useLightMap.preload = (texture: string) => useTexture.preload(texture);

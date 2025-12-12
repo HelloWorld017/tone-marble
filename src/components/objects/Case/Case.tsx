@@ -4,6 +4,7 @@ import LightmapTexture from '@/assets/textures/lightmap.webp?url';
 import { useLightMap } from '@/hooks/useLightMap';
 import { CaseButtons } from './CaseButtons';
 import { CaseKnobs } from './CaseKnobs';
+import { CasePower } from './CasePower';
 import { CaseVolume } from './CaseVolume';
 import type { GLTFResult } from '@/types/GLTFResult';
 
@@ -97,6 +98,7 @@ export const Case = () => {
       <CaseButtons nodes={nodes} materials={materials} />
       <CaseKnobs nodes={nodes} materials={materials} />
       <CaseVolume nodes={nodes} materials={materials} />
+      <CasePower nodes={nodes} materials={materials} />
       <group position={[0, 0.5, -5.8]}>
         <primitive object={nodes.DiscButtonBone} />
         <primitive object={nodes.DiscDiscBone} />
@@ -170,20 +172,9 @@ export const Case = () => {
         geometry={nodes.Body_3.geometry}
         material={materials['Glass.Inner']}
       />
-      <primitive object={nodes.PowerBone} />
-      <primitive object={nodes.neutral_bone_8} />
-      <skinnedMesh
-        geometry={nodes.PowerMesh_1.geometry}
-        material={materials.Base}
-        skeleton={nodes.PowerMesh_1.skeleton}
-      />
-      <skinnedMesh
-        geometry={nodes.PowerMesh_2.geometry}
-        material={materials.Power}
-        skeleton={nodes.PowerMesh_2.skeleton}
-      />
     </group>
   );
 };
 
 useGLTF.preload(CaseObject);
+useLightMap.preload(LightmapTexture);

@@ -20,7 +20,9 @@ export const CaseVolume = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mat
     bone: nodes.ButtonMuteBone,
     state: useInterfaceState(state => state.volume),
     onChange: useInterfaceState(state => state.setVolume),
-    width: 5,
+    width: 3.8,
+    offset: -1.75,
+    sensitivity: 0.001,
   });
 
   return (
