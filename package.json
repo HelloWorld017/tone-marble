@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
+    "@react-spring/three": "^10.0.3",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.4.2",
     "@react-three/postprocessing": "^3.0.4",
@@ -39,6 +40,7 @@
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-backend-webgpu": "^4.22.0",
     "@types/three": "^0.181.0",
+    "es-toolkit": "^1.42.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "three": "^0.181.2"

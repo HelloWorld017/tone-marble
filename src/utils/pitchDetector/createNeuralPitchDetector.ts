@@ -94,6 +94,9 @@ const predictSpice = async (model: tf.GraphModel | tf.LayersModel, audioData: Fl
  * PitchDetector Node Implementation
  * ----
  */
+
+const workletEnabledContext = new WeakSet<AudioContext>();
+
 type CreateNeuralPitchDetectorProps = {
   modelKind?: PitchModelKind;
 };
@@ -103,7 +106,9 @@ export const createNeuralPitchDetector = async (
   callback: (result: PitchResult) => void,
   opts?: CreateNeuralPitchDetectorProps
 ) => {
-  const audioWorkletPromise = ctx.audioWorklet.addModule(sampleProcessorWorklet);
+  const audioWorkletPromise = workletEnabledContext.has(ctx)
+    ? Promise.resolve()
+    : ctx.audioWorklet.addModule(sampleProcessorWorklet).then(() => workletEnabledContext.add(ctx));
 
   const modelKind = opts?.modelKind ?? 'crepe';
   const modelPromise = tf

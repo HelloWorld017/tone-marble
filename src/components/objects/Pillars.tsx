@@ -1,8 +1,11 @@
 import { Instance, Instances } from '@react-three/drei';
 import { CapsuleCollider, RigidBody } from '@react-three/rapier';
 import { useMemo } from 'react';
-import type { CollisionEnterHandler } from '@react-three/rapier';
+import { useLatestCallback } from '@/hooks/useLatestCallback';
+import { useSynthesize } from '../audio/SynthesizeProvider';
+import type { ContactForceHandler } from '@react-three/rapier';
 
+const MAX_COLLISION_FORCE = 20;
 const PILLAR_RADIUS = 0.1;
 const PILLAR_HEIGHT = 0.5;
 const PILLAR_SEGMENTS = 16;
@@ -13,7 +16,6 @@ type PillarsProps = {
   rowGap?: number;
   columns: number;
   columnGap?: number;
-  onCollide?: CollisionEnterHandler;
 };
 
 export const Pillars = ({
@@ -22,7 +24,6 @@ export const Pillars = ({
   rowGap = 1.5,
   columns,
   columnGap = 1.5,
-  onCollide,
 }: PillarsProps) => {
   const pillars = useMemo(() => {
     const instances = [];
@@ -45,6 +46,24 @@ export const Pillars = ({
     return instances;
   }, [planeAngle, rows, rowGap, columns, columnGap]);
 
+  const synthesizeSine = useSynthesize(state => state.synthesizeSine);
+  const synthesizeNoise = useSynthesize(state => state.synthesizeNoise);
+  const onCollide = useLatestCallback<ContactForceHandler>(event => {
+    if (event.maxForceMagnitude < 1) {
+      return;
+    }
+
+    const position = event.other.rigidBody?.translation();
+    if (!position) {
+      return;
+    }
+
+    (Math.random() < 0.5 ? synthesizeSine : synthesizeNoise)(
+      [position.x, position.y, position.z],
+      Math.max(0, Math.min(1, event.maxForceMagnitude / MAX_COLLISION_FORCE))
+    );
+  });
+
   return (
     <>
       <Instances>
@@ -55,7 +74,7 @@ export const Pillars = ({
         ))}
       </Instances>
 
-      <RigidBody type="fixed" onCollisionEnter={onCollide}>
+      <RigidBody type="fixed" onContactForce={onCollide}>
         {pillars.map(data => (
           <CapsuleCollider
             key={data.key}

@@ -19,6 +19,8 @@ export type MarblesProps = {
   spawnHeight?: number;
   spawnX?: number;
   spawnY?: number;
+  resetBound?: [[number, number, number], [number, number, number]];
+  resetX?: number;
   resetY?: number;
   automatic?: boolean;
 };
@@ -29,9 +31,12 @@ export const Marbles = ({
   count = 500,
   spawnWidth = 5,
   spawnHeight = 1,
-  spawnX = -10,
-  spawnY = 10,
-  resetY = -5,
+  spawnX = -12,
+  spawnY = 5,
+  resetBound = [
+    [spawnX - 5, -5, -5],
+    [13, spawnY + 1, 5],
+  ],
   automatic = true,
 }: MarblesProps) => {
   const spawnIndex = useRef(0);
@@ -44,24 +49,41 @@ export const Marbles = ({
     [count]
   );
 
-  // Sleep all marbles
-  useLayoutEffect(() => {
-    if (!meshRef.current) {
-      return;
+  const despawnMarble = (index: number) => {
+    const body = bodiesRef.current?.[index];
+    if (!body || !meshRef.current) {
+      throw new Error('Marble does not exist!');
     }
 
-    for (let i = 0; i < count; i++) {
-      meshRef.current.setMatrixAt(i, HOLD_MATRIX);
-    }
+    body.setTranslation(HOLD_POS, false);
+    body.sleep();
+    body.setEnabled(false);
 
+    meshRef.current.setMatrixAt(index, HOLD_MATRIX);
     meshRef.current.instanceMatrix.needsUpdate = true;
-  }, [count]);
+  };
 
+  // Disable all marbles
   useLayoutEffect(() => {
-    bodiesRef.current?.forEach(body => {
-      body.sleep();
-    });
-  }, []);
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    const checkAndDisable = () => {
+      if (!bodiesRef.current?.length || !meshRef.current) {
+        timeoutId = setTimeout(checkAndDisable, 50);
+        return;
+      }
+
+      for (let i = 0; i < count; i++) {
+        despawnMarble(i);
+      }
+    };
+
+    checkAndDisable();
+    return () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [count]);
 
   // Spawn Logic
   const spawn = useLatestCallback(() => {
@@ -86,6 +108,7 @@ export const Marbles = ({
       { x: Math.random() - 0.5, y: Math.random() - 0.5, z: Math.random() - 0.5 },
       true
     );
+    body.setEnabled(true);
     body.wakeUp();
 
     // Initialize Mesh
@@ -118,25 +141,23 @@ export const Marbles = ({
       return;
     }
 
-    let needsUpdate = false;
     bodiesRef.current.forEach((body, i) => {
       if (body.isSleeping()) {
         return;
       }
 
-      if (body.translation().y < resetY) {
-        // Clean RigidBody
-        body.sleep();
-
-        // Clean Mesh
-        meshRef.current!.setMatrixAt(i, HOLD_MATRIX);
-        needsUpdate = true;
+      const translation = body.translation();
+      if (
+        translation.x < resetBound[0][0] ||
+        translation.x > resetBound[1][0] ||
+        translation.y < resetBound[0][1] ||
+        translation.y > resetBound[1][1] ||
+        translation.z < resetBound[0][2] ||
+        translation.z > resetBound[1][2]
+      ) {
+        despawnMarble(i);
       }
     });
-
-    if (needsUpdate) {
-      meshRef.current.instanceMatrix.needsUpdate = true;
-    }
   });
 
   return (

@@ -23,14 +23,26 @@ const UNLIT_DIFFUSE_PREAMBLE = glsl`
   #define RE_IndirectDiffuse RE_IndirectDiffuse_Unlit
 `;
 
-export const useLightMap = (texture: string, materials: Record<string, MeshStandardMaterial>) => {
+type UseLightMapProps = {
+  excludedMaterials?: string[];
+};
+
+export const useLightMap = (
+  texture: string,
+  materials: Record<string, MeshStandardMaterial>,
+  opts: UseLightMapProps = {}
+) => {
   const lightMap = useTexture(texture);
   lightMap.flipY = false;
   lightMap.colorSpace = NoColorSpace;
   lightMap.channel = 1;
 
   useEffect(() => {
-    Object.values(materials).forEach(material => {
+    Object.entries(materials).forEach(([key, material]) => {
+      if (opts.excludedMaterials?.includes(key)) {
+        return;
+      }
+
       material.onBeforeCompile = shader => {
         shader.fragmentShader = shader.fragmentShader.replace(
           /void\s+main.*/,
