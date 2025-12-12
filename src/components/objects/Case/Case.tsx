@@ -3,8 +3,10 @@ import CaseObject from '@/assets/objects/case.glb?url';
 import LightmapTexture from '@/assets/textures/lightmap.webp?url';
 import { useLightMap } from '@/hooks/useLightMap';
 import { CaseButtons } from './CaseButtons';
+import { CaseIndicator } from './CaseIndicator';
 import { CaseKnobs } from './CaseKnobs';
 import { CasePower } from './CasePower';
+import { CaseTurntable } from './CaseTurntable';
 import { CaseVolume } from './CaseVolume';
 import type { GLTFResult } from '@/types/GLTFResult';
 
@@ -99,66 +101,8 @@ export const Case = () => {
       <CaseKnobs nodes={nodes} materials={materials} />
       <CaseVolume nodes={nodes} materials={materials} />
       <CasePower nodes={nodes} materials={materials} />
-      <group position={[0, 0.5, -5.8]}>
-        <primitive object={nodes.DiscButtonBone} />
-        <primitive object={nodes.DiscDiscBone} />
-        <primitive object={nodes.neutral_bone_7} />
-        <skinnedMesh
-          geometry={nodes.DiscMesh_1.geometry}
-          material={materials.Base}
-          skeleton={nodes.DiscMesh_1.skeleton}
-        />
-        <skinnedMesh
-          geometry={nodes.DiscMesh_2.geometry}
-          material={materials.Button}
-          skeleton={nodes.DiscMesh_2.skeleton}
-        />
-        <skinnedMesh
-          geometry={nodes.DiscMesh_3.geometry}
-          material={materials['Button.Image']}
-          skeleton={nodes.DiscMesh_3.skeleton}
-        />
-        <skinnedMesh
-          geometry={nodes.DiscMesh_4.geometry}
-          material={materials['Turntable.Simple']}
-          skeleton={nodes.DiscMesh_4.skeleton}
-        />
-        <skinnedMesh
-          geometry={nodes.DiscMesh_5.geometry}
-          material={materials['Turntable.Simple']}
-          skeleton={nodes.DiscMesh_5.skeleton}
-        />
-      </group>
-      <group position={[0, 0.5, -5.8]}>
-        <primitive object={nodes.IndicatorBaseBone} />
-        <primitive object={nodes.IndicatorHighlightBone} />
-        <primitive object={nodes.neutral_bone_9} />
-        <skinnedMesh
-          geometry={nodes.IndicatorMesh_1.geometry}
-          material={materials.Base}
-          skeleton={nodes.IndicatorMesh_1.skeleton}
-        />
-        <skinnedMesh
-          geometry={nodes.IndicatorMesh_2.geometry}
-          material={materials['Base.Image']}
-          skeleton={nodes.IndicatorMesh_2.skeleton}
-        />
-        <skinnedMesh
-          geometry={nodes.IndicatorMesh_3.geometry}
-          material={materials['Base.Film']}
-          skeleton={nodes.IndicatorMesh_3.skeleton}
-        />
-        <skinnedMesh
-          geometry={nodes.IndicatorMesh_4.geometry}
-          material={materials['Meter.Light']}
-          skeleton={nodes.IndicatorMesh_4.skeleton}
-        />
-        <skinnedMesh
-          geometry={nodes.IndicatorMesh_5.geometry}
-          material={materials['Meter.Highlight']}
-          skeleton={nodes.IndicatorMesh_5.skeleton}
-        />
-      </group>
+      <CaseIndicator nodes={nodes} materials={materials} />
+      <CaseTurntable nodes={nodes} materials={materials} />
       <mesh castShadow receiveShadow geometry={nodes.Body_1.geometry} material={materials.Base} />
       <mesh
         castShadow

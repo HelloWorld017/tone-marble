@@ -46,7 +46,7 @@ export const useKnob = ({ state, onChange }: UseKnobProps) => {
     const blendRate = Math.min(magnitude / MAX_BLEND_DISTANCE, 1);
     const nextRotation = initialState.current.rotate * (1 - blendRate) + rotation * blendRate;
     onChangeThrottled(-nextRotation / (Math.PI * 1.5));
-    boneRotate.start(nextRotation).catch(() => {});
+    void boneRotate.start(nextRotation);
   };
 
   return {

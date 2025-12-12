@@ -51,6 +51,7 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
   const [isMetalActive, setIsMetalActive] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [isPoweredOn, setIsPoweredOn] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [wave, setWave] = useState(0);
   const [radius, setRadius] = useState(0);
   const [volume, setVolume] = useState(1);
@@ -69,11 +70,13 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
     isMetalActive: isPoweredOn && isMetalActive,
     isMuted,
     isPoweredOn,
+    isRecording: isPoweredOn && isRecording,
     setIsSandActive,
     setIsGlassActive,
     setIsMetalActive,
     setIsMuted,
     setIsPoweredOn,
+    setIsRecording,
 
     // Knobs
     wave,

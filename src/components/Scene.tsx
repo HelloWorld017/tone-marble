@@ -1,5 +1,5 @@
 import { Cloud, Clouds, Environment, Html, OrbitControls, useProgress } from '@react-three/drei';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Bloom,
   ChromaticAberration,
@@ -7,19 +7,22 @@ import {
   ToneMapping,
 } from '@react-three/postprocessing';
 import { Physics } from '@react-three/rapier';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import {
   AudioContext as ThreeAudioContext,
   AudioListener as ThreeAudioListener,
   MeshBasicMaterial,
   Vector2,
+  Matrix4,
 } from 'three';
 import { InterfaceStateProvider, useInterfaceState } from './InterfaceStateProvider';
+import { PitchMapProvider } from './PitchMapProvider';
 import {
+  AudioContextClickInitializer,
   AudioContextProvider,
-  AudioContextTestInitializer,
   useAudioContext,
 } from './audio/AudioContextProvider';
+import { PitchDetector } from './audio/PitchDetector';
 import { SynthesizeProvider, useSynthesize } from './audio/SynthesizeProvider';
 import { useFluorescentBlink } from './hooks/useFluorescentBlink';
 import { Case } from './objects/Case';
@@ -80,6 +83,7 @@ const SceneAudioListener = () => {
   const { camera } = useThree();
   const isMuted = useInterfaceState(state => state.isMuted);
   const volume = useInterfaceState(state => state.volume);
+  const analyzerOut = useSynthesize(state => state.analyzerOut);
   const destinationOut = useSynthesize(state => state.destinationOut);
 
   useEffect(() => {
@@ -96,10 +100,11 @@ const SceneAudioListener = () => {
   }, [ctx, camera]);
 
   useEffect(() => {
-    if (destinationOut) {
+    if (analyzerOut && destinationOut) {
+      analyzerOut.gain.value = +!isMuted * volume;
       destinationOut.gain.value = +!isMuted * volume;
     }
-  }, [destinationOut, isMuted, volume]);
+  }, [analyzerOut, destinationOut, isMuted, volume]);
 
   return <></>;
 };
@@ -130,24 +135,45 @@ const SceneProgress = () => {
   return <Html center>{progress.toFixed(2)} % loaded</Html>;
 };
 
+const RaycastWhenCameraMoves = () => {
+  const matrix = new Matrix4();
+  const lastCameraUpdate = useRef(0);
+  useFrame(state => {
+    if (
+      lastCameraUpdate.current < performance.now() - 100 &&
+      !matrix.equals(state.camera.matrixWorld)
+    ) {
+      state.events.update?.();
+      matrix.copy(state.camera.matrixWorld);
+      lastCameraUpdate.current = performance.now();
+    }
+  });
+
+  return <></>;
+};
+
 export const Scene = () => (
   <AudioContextProvider>
-    <AudioContextTestInitializer />
-    <SynthesizeProvider>
-      <InterfaceStateProvider>
-        <div style={{ width: '100vw', height: '100vh' }}>
-          <Canvas shadows camera={{ position: [0, 0, 30], fov: 50 }} flat>
-            <Suspense fallback={<SceneProgress />}>
-              <color attach="background" args={['#c0c0c0']} />
-              <SceneAudioListener />
-              <SceneEffects />
-              <SceneEnvironment />
-              <SceneObjects />
-              <SceneOrbitControls />
-            </Suspense>
-          </Canvas>
-        </div>
-      </InterfaceStateProvider>
-    </SynthesizeProvider>
+    <AudioContextClickInitializer />
+    <InterfaceStateProvider>
+      <PitchMapProvider>
+        <SynthesizeProvider>
+          <div style={{ width: '100vw', height: '100vh' }}>
+            <Canvas shadows camera={{ position: [0, 0, 30], fov: 50 }} flat>
+              <Suspense fallback={<SceneProgress />}>
+                <color attach="background" args={['#c0c0c0']} />
+                <SceneAudioListener />
+                <SceneEffects />
+                <SceneEnvironment />
+                <SceneObjects />
+                <SceneOrbitControls />
+              </Suspense>
+              <RaycastWhenCameraMoves />
+            </Canvas>
+          </div>
+        </SynthesizeProvider>
+        <PitchDetector />
+      </PitchMapProvider>
+    </InterfaceStateProvider>
   </AudioContextProvider>
 );

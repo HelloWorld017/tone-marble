@@ -58,7 +58,7 @@ export const useSlider = ({
       ((event.clientX - initialState.current.x) / width) * sensitivity * event.distance;
 
     const nextState = Math.max(0, Math.min(initialState.current.state + deltaX, 1));
-    stateSpring.start(nextState).catch(() => {});
+    void stateSpring.start(nextState);
     onChangeThrottled(nextState);
   };
 

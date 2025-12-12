@@ -2,6 +2,7 @@ import { Instance, Instances } from '@react-three/drei';
 import { CapsuleCollider, RigidBody } from '@react-three/rapier';
 import { useMemo } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
+import { usePitchMap } from '../PitchMapProvider';
 import { useSynthesize } from '../audio/SynthesizeProvider';
 import type { ContactForceHandler } from '@react-three/rapier';
 
@@ -48,6 +49,7 @@ export const Pillars = ({
 
   const synthesizeSine = useSynthesize(state => state.synthesizeSine);
   const synthesizeNoise = useSynthesize(state => state.synthesizeNoise);
+  const advancePointer = usePitchMap(state => state.advancePointer);
   const onCollide = useLatestCallback<ContactForceHandler>(event => {
     if (event.maxForceMagnitude < 1) {
       return;
@@ -62,6 +64,8 @@ export const Pillars = ({
       [position.x, position.y, position.z],
       Math.max(0, Math.min(1, event.maxForceMagnitude / MAX_COLLISION_FORCE))
     );
+
+    advancePointer();
   });
 
   return (

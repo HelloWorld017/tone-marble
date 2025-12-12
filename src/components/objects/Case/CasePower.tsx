@@ -34,7 +34,7 @@ export const CasePower = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
       setTimeout(() => {
         playAudio(isPoweredOnInternal ? uindowsOffSoundBuffer : uindowsBootSoundBuffer);
         setIsPoweredOnInternal(!isPoweredOnInternal);
-      }, 0);
+      }, 300);
     },
   });
 

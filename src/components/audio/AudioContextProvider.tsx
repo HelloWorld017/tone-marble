@@ -27,7 +27,7 @@ export const useAudioContext = () => useAudioContextProvider(state => state.audi
 export const useInitializeAudioContext = () => useAudioContextProvider(state => state.initialize);
 export { AudioContextProvider };
 
-export const AudioContextTestInitializer = () => {
+export const AudioContextClickInitializer = () => {
   const initialize = useInitializeAudioContext();
   useEffect(() => {
     window.addEventListener('click', initialize, { capture: true });

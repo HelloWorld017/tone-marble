@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
+import { usePitchMap } from '../PitchMapProvider';
 import { useAudioContext } from './AudioContextProvider';
 import { useDynamicsCompressor } from './hooks/useDynamicsCompressor';
 import { useGain } from './hooks/useGain';
@@ -65,8 +66,8 @@ const getRandomFrequency = (baseFrequency: number) => {
  */
 export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
   const activeVoices = useRef(0);
-  const baseFrequency = useRef(440);
   const listenerPosition = useRef<Position>([0, 0, 0]);
+  const readPitch = usePitchMap(state => state.readPitch);
 
   const ctx = useAudioContext();
   const masterCompressor = useDynamicsCompressor({ threshold: -10, ratio: 12 }, ctx?.destination);
@@ -88,10 +89,6 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     ctx.listener.positionZ.value = position[2];
   });
 
-  const updateBaseFrequency = useLatestCallback((frequency: number) => {
-    baseFrequency.current = frequency;
-  });
-
   const updatePannerForPosition = useLatestCallback((panner: PannerNode, position: Position) => {
     panner.panningModel = 'equalpower';
     panner.distanceModel = 'inverse';
@@ -101,6 +98,10 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     panner.positionY.value = position[1];
     panner.positionZ.value = position[2];
   });
+
+  const readBaseFrequency = useLatestCallback(
+    () => 440 * Math.pow(2, (readPitch() + 48 - 69) / 12)
+  );
 
   /* Sine-based Synthesizer */
   const synthesizeSine = useLatestCallback((position: Position, gain: number) => {
@@ -118,7 +119,7 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     const envelope = ctx.createGain();
     const panner = ctx.createPanner();
 
-    const frequency = getRandomFrequency(baseFrequency.current);
+    const frequency = getRandomFrequency(readBaseFrequency());
     osc.type = 'sine';
     osc.frequency.value = frequency;
 
@@ -167,7 +168,7 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     source.loopStart = Math.random() * (WHITENOISE_BUFFER_SIZE - 0.5);
     source.loopEnd = source.loopStart + 0.5;
 
-    const frequency = getRandomFrequency(baseFrequency.current);
+    const frequency = getRandomFrequency(readBaseFrequency());
     filter.type = 'bandpass';
     filter.frequency.value = frequency;
     filter.Q.value = 0.5 + Math.random() * 0.5;
@@ -229,7 +230,6 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
   return {
     analyzerOut,
     destinationOut,
-    updateBaseFrequency,
     updateListenerPosition,
     synthesizeSine,
     synthesizeNoise,

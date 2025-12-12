@@ -9,7 +9,7 @@ export const useFluorescentBlink = (isEnabled: boolean) => {
       return;
     }
 
-    const maxIteration = Math.random() * 2 + 3;
+    const maxIteration = 8;
     let iteration = 0;
     let isTurnedOn = false;
     let interval = 100;
@@ -26,7 +26,7 @@ export const useFluorescentBlink = (isEnabled: boolean) => {
         ? interval
         : interval * (1 - (iteration / maxIteration) ** 2) * 4;
 
-      const nextIntensity = isTurnedOn ? 0 : intensity * 0.7 + intensity * Math.random() * 0.2;
+      const nextIntensity = isTurnedOn ? 0 : 1 * 0.7 + 1 * Math.random() * 0.2;
       setIntensity(nextIntensity);
 
       interval -= Math.random() * 10;
@@ -35,7 +35,7 @@ export const useFluorescentBlink = (isEnabled: boolean) => {
       timeoutId = setTimeout(blink, nextTimeout);
     };
 
-    blink();
+    timeoutId = setTimeout(blink, 500);
 
     return () => {
       if (timeoutId !== null) {

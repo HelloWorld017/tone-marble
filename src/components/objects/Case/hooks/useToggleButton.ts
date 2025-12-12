@@ -27,10 +27,10 @@ export const useToggleButton = ({
   const toggleTockSoundBuffer = useLoader(AudioLoader, ToggleTockSound);
 
   const { isActive, groupProps } = useHover({
-    onPointerDown: () => playAudio(bone.position.toArray(), toggleTickSoundBuffer),
+    onPointerDown: () => playAudio(toggleTickSoundBuffer, bone.position.toArray()),
     onPointerUpActive: () => {
       onChange(!state);
-      playAudio(bone.position.toArray(), toggleTockSoundBuffer);
+      playAudio(toggleTockSoundBuffer, bone.position.toArray());
     },
   });
 

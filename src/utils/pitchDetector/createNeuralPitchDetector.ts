@@ -136,7 +136,7 @@ export const createNeuralPitchDetector = async (
     exhaustive(modelKind);
   };
 
-  const workletNode = new AudioWorkletNode(ctx, 'pitch-processor');
+  const workletNode = new AudioWorkletNode(ctx, 'sample-processor');
   workletNode.port.onmessage = event => {
     const { audioData } = event.data as { audioData: Float32Array };
     void predict(audioData);
