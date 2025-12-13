@@ -9,13 +9,14 @@ const MAX_BLEND_DISTANCE = 5;
 type UseKnobProps = {
   state: number;
   onChange: (nextState: number) => void;
+  infinite?: boolean;
 };
 
-export const useKnob = ({ state, onChange }: UseKnobProps) => {
+export const useKnob = ({ state, onChange, infinite = false }: UseKnobProps) => {
   const onChangeLatest = useLatestCallback(onChange);
   const onChangeThrottled = useMemo(() => throttle(onChangeLatest, 150), [onChange]);
   const { boneRotate } = useSpring({
-    boneRotate: -state * Math.PI * 1.5,
+    boneRotate: -state * Math.PI * (infinite ? 2 : 1.5),
   });
 
   const initialState = useRef({ x: 0, y: 0, rotate: boneRotate.get() });
@@ -40,12 +41,13 @@ export const useKnob = ({ state, onChange }: UseKnobProps) => {
     const angle = Math.atan2(deltaX, deltaY) + Math.PI;
     const magnitude = Math.hypot(deltaX, deltaY);
 
-    const rotation =
-      (1 / 4) * Math.PI - Math.max((1 / 4) * Math.PI, Math.min(angle, (7 / 4) * Math.PI));
+    const rotation = infinite
+      ? (1 / 4) * Math.PI - angle
+      : (1 / 4) * Math.PI - Math.max((1 / 4) * Math.PI, Math.min(angle, (7 / 4) * Math.PI));
 
     const blendRate = Math.min(magnitude / MAX_BLEND_DISTANCE, 1);
     const nextRotation = initialState.current.rotate * (1 - blendRate) + rotation * blendRate;
-    onChangeThrottled(-nextRotation / (Math.PI * 1.5));
+    onChangeThrottled(-nextRotation / (Math.PI * (infinite ? 2 : 1.5)));
     void boneRotate.start(nextRotation);
   };
 

@@ -31,6 +31,7 @@ export const CaseVolume = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mat
         <a.primitive object={nodes.SliderBone} position-x={slider.boneX} />
         <primitive object={nodes.neutral_bone_3} />
         <skinnedMesh
+          frustumCulled={false}
           geometry={nodes.SliderMesh_1.geometry}
           material={materials.Base}
           skeleton={nodes.SliderMesh_1.skeleton}
@@ -38,11 +39,13 @@ export const CaseVolume = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mat
 
         <group {...slider.groupProps}>
           <skinnedMesh
+            frustumCulled={false}
             geometry={nodes.SliderMesh_2.geometry}
             material={materials['Slider.Handle']}
             skeleton={nodes.SliderMesh_2.skeleton}
           />
           <skinnedMesh
+            frustumCulled={false}
             geometry={nodes.SliderMesh_3.geometry}
             material={materials['Slider.Track']}
             skeleton={nodes.SliderMesh_3.skeleton}
@@ -53,17 +56,20 @@ export const CaseVolume = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mat
         <a.primitive object={nodes.ButtonMuteBone} position-z={muteButton.boneZ} />
         <primitive object={nodes.neutral_bone_4} />
         <skinnedMesh
+          frustumCulled={false}
           geometry={nodes.ButtonMuteMesh_1.geometry}
           material={materials.Base}
           skeleton={nodes.ButtonMuteMesh_1.skeleton}
         />
         <group {...muteButton.groupProps}>
           <skinnedMesh
+            frustumCulled={false}
             geometry={nodes.ButtonMuteMesh_2.geometry}
             material={materials.Button}
             skeleton={nodes.ButtonMuteMesh_2.skeleton}
           />
           <skinnedMesh
+            frustumCulled={false}
             geometry={nodes.ButtonMuteMesh_3.geometry}
             material={materials['Button.Image']}
             skeleton={nodes.ButtonMuteMesh_3.skeleton}

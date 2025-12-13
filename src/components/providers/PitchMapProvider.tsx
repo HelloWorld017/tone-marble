@@ -7,7 +7,7 @@ import { useInterfaceState } from './InterfaceStateProvider';
 const TEXTURE_SIZE = 512;
 const TEXTURE_RADIUS = 192;
 const CHROMA_COLORS = Array.from({ length: 12 }).map(
-  (_, index) => `oklch(0.6096 0.1744 ${360 / index})`
+  (_, index) => `oklch(0.6096 0.1744 ${index * 30})`
 );
 
 const TIMESTAMP_POOL_SIZE = 64;
@@ -38,8 +38,8 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
   const [chromaMap] = useState(() => new Float32Array(RECORD_SIZE));
   const latestPendingChroma = useRef<number | null>(null);
 
-  const updateChroma = useCallback((nextPitch: number) => {
-    latestPendingChroma.current = nextPitch;
+  const updateChroma = useCallback((nextChroma: number | null) => {
+    latestPendingChroma.current = nextChroma;
   }, []);
 
   const readPitch = useLatestCallback(() => {

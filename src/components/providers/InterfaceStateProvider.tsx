@@ -53,7 +53,7 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
   const [isMuted, setIsMuted] = useState(false);
   const [isPoweredOn, setIsPoweredOn] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [wave, setWave] = useState(0);
+  const [rhythm, setRhythm] = useState(0);
   const [radius, setRadius] = useState(0);
   const [volume, setVolume] = useState(1);
 
@@ -82,9 +82,9 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
     setIsRecording,
 
     // Knobs
-    wave,
+    rhythm,
     radius,
-    setWave,
+    setRhythm,
     setRadius,
 
     // Sliders

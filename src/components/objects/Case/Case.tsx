@@ -5,6 +5,7 @@ import { useLightMap } from '@/hooks/useLightMap';
 import { CaseButtons } from './CaseButtons';
 import { CaseIndicator } from './CaseIndicator';
 import { CaseKnobs } from './CaseKnobs';
+import { CaseMIDI } from './CaseMIDI';
 import { CasePower } from './CasePower';
 import { CaseTurntable } from './CaseTurntable';
 import { CaseVolume } from './CaseVolume';
@@ -13,7 +14,7 @@ import type { GLTFResult } from '@/types/GLTFResult';
 export const Case = () => {
   const { nodes, materials } = useGLTF(CaseObject) as GLTFResult;
   useLightMap(LightmapTexture, materials, {
-    excludedMaterials: ['Knob.Side'],
+    excludedMaterials: [],
   });
 
   return (
@@ -50,20 +51,6 @@ export const Case = () => {
         <mesh
           castShadow
           receiveShadow
-          geometry={nodes.InputMesh.geometry}
-          material={materials.Base}
-        />
-        <mesh
-          castShadow
-          receiveShadow
-          geometry={nodes.InputMesh_1.geometry}
-          material={materials.Connector}
-        />
-      </group>
-      <group position={[0, 0.5, -5.8]}>
-        <mesh
-          castShadow
-          receiveShadow
           geometry={nodes.Speaker_1.geometry}
           material={materials.Base}
         />
@@ -83,26 +70,13 @@ export const Case = () => {
           material={materials['Base.Image']}
         />
       </group>
-      <group position={[0, 0.5, -5.8]}>
-        <mesh
-          castShadow
-          receiveShadow
-          geometry={nodes.IconRadius_1.geometry}
-          material={materials.Base}
-        />
-        <mesh
-          castShadow
-          receiveShadow
-          geometry={nodes.IconRadius_2.geometry}
-          material={materials['Base.Image']}
-        />
-      </group>
       <CaseButtons nodes={nodes} materials={materials} />
       <CaseKnobs nodes={nodes} materials={materials} />
       <CaseVolume nodes={nodes} materials={materials} />
       <CasePower nodes={nodes} materials={materials} />
       <CaseIndicator nodes={nodes} materials={materials} />
       <CaseTurntable nodes={nodes} materials={materials} />
+      <CaseMIDI nodes={nodes} materials={materials} />
       <mesh castShadow receiveShadow geometry={nodes.Body_1.geometry} material={materials.Base} />
       <mesh
         castShadow

@@ -58,7 +58,7 @@ export const CasePower = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
   return (
     <group {...groupProps}>
       <a.primitive object={nodes.PowerBone} position-x={bonePositionX} rotation-y={boneRotateY} />
-      <primitive object={nodes.neutral_bone_8} />
+      <primitive object={nodes.neutral_bone_7} />
       <skinnedMesh
         geometry={nodes.PowerMesh_1.geometry}
         material={materials.Base}

@@ -21,7 +21,7 @@ export const CaseIndicator = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | '
         scale-y={volumeSpring.to(y => Math.max(0, Math.min(y - 0.8, 0.2)) / 0.2)}
       />
 
-      <primitive object={nodes.neutral_bone_9} />
+      <primitive object={nodes.neutral_bone_8} />
       <skinnedMesh
         geometry={nodes.IndicatorMesh_1.geometry}
         material={materials.Base}

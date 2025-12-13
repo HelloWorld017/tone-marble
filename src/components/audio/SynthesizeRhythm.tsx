@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
+import { useLatestRef } from '@/hooks/useLatestRef';
 import { createCrakleGenerator } from '@/utils/crakleGenerator';
+import { useInterfaceState } from '../providers/InterfaceStateProvider';
 import { usePitchMap } from '../providers/PitchMapProvider';
 import { useAudioContext } from './AudioContextProvider';
 import { useSynthesize } from './SynthesizeProvider';
-import { useBiquadFilter } from './hooks/useBiquadFilter';
 import { useBufferSource } from './hooks/useBufferSource';
 import { useConnectNode } from './hooks/useConnectNode';
 import { useGain } from './hooks/useGain';
@@ -148,6 +149,8 @@ export const SynthesizeRhythm = () => {
     };
   }, [effectiveSpeed, synthesizeKick, synthesizeHiHat]);
 
+  const overallVolume = useInterfaceState(state => state.rhythm);
+  const overallVolumeRef = useLatestRef(overallVolume);
   useEffect(() => {
     if (!ctx || !loFiOut || !rhythmOut) {
       return () => {};
@@ -158,12 +161,12 @@ export const SynthesizeRhythm = () => {
       const blendRate = Math.max(-50, Math.min(effectiveSpeed.current - 50, 50)) / 100 + 0.5;
       const loFiVolume = effectiveSpeed.current < 10 ? 0 : 1 - blendRate;
       const rhythmVolume = effectiveSpeed.current < 10 ? 0 : blendRate;
-      loFiOut.gain.linearRampToValueAtTime(loFiVolume, t + 0.15);
-      rhythmOut.gain.linearRampToValueAtTime(rhythmVolume, t + 0.15);
+      loFiOut.gain.linearRampToValueAtTime(loFiVolume * overallVolumeRef.current, t + 0.15);
+      rhythmOut.gain.linearRampToValueAtTime(rhythmVolume * overallVolumeRef.current, t + 0.15);
     }, 150);
 
     return () => clearInterval(intervalId);
-  }, [ctx, loFiOut, effectiveSpeed]);
+  }, [ctx, loFiOut, effectiveSpeed, overallVolumeRef]);
 
   return <></>;
 };

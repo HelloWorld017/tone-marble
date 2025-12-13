@@ -161,7 +161,7 @@ const RaycastWhenCameraMoves = () => {
 export const Scene = () => (
   <div style={{ width: '100vw', height: '100vh' }}>
     <Canvas shadows flat>
-      <PerspectiveCamera makeDefault position={[0, 0, 30]} fov={50} near={0.1} far={500} />
+      <PerspectiveCamera makeDefault position={[0, 0, 30]} fov={50} near={0.01} far={500} />
       <Suspense fallback={<SceneProgress />}>
         <color attach="background" args={['#c0c0c0']} />
         <SceneAudioListener />
