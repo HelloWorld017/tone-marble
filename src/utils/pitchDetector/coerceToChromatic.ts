@@ -4,6 +4,6 @@ export const coerceToChromatic = (frequency: number) => {
   const offTune = midiFloat - midiRounded;
 
   const weight = 1 - (2 * offTune) ** 2;
-  const chromatic = midiRounded % 12;
-  return { chromatic, weight };
+  const chroma = midiRounded % 12;
+  return { chroma, weight };
 };

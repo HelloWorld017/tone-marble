@@ -98,10 +98,6 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     ctx.listener.positionZ.value = position[2];
   });
 
-  const readBaseFrequency = useLatestCallback(
-    () => 440 * Math.pow(2, (readPitch() + 48 - 69) / 12)
-  );
-
   /* Sine-based Synthesizer */
   const synthesizeSine = useLatestCallback((position: Position, gain: number) => {
     if (!ctx || !destinationOut || !analyzerOut) {
@@ -118,7 +114,7 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     const envelope = ctx.createGain();
     const panner = ctx.createPanner();
 
-    const frequency = getRandomFrequency(readBaseFrequency());
+    const frequency = getRandomFrequency(readPitch());
     osc.type = 'sine';
     osc.frequency.value = frequency;
 
@@ -168,7 +164,7 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     source.loopStart = Math.random() * (WHITENOISE_BUFFER_SIZE - 0.5);
     source.loopEnd = source.loopStart + 0.5;
 
-    const frequency = getRandomFrequency(readBaseFrequency());
+    const frequency = getRandomFrequency(readPitch());
     filter.type = 'bandpass';
     filter.frequency.value = frequency;
     filter.Q.value = 0.5 + Math.random() * 0.5;

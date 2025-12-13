@@ -57,7 +57,7 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
   const [radius, setRadius] = useState(0);
   const [volume, setVolume] = useState(1);
 
-  const [pitchModelKind, setPitchModelKind] = useState<PitchModelKind | 'fft'>('crepe');
+  const [pitchModelKind, setPitchModelKind] = useState<PitchModelKind | 'fft'>('fft');
 
   return {
     // Cursor Management

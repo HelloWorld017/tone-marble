@@ -6,7 +6,7 @@ import { useInterfaceState } from './InterfaceStateProvider';
 
 const TEXTURE_SIZE = 512;
 const TEXTURE_RADIUS = 192;
-const PITCH_COLORS = Array.from({ length: 12 }).map(
+const CHROMA_COLORS = Array.from({ length: 12 }).map(
   (_, index) => `oklch(0.6096 0.1744 ${360 / index})`
 );
 
@@ -35,19 +35,20 @@ const useEffectiveSpeed = () => {
 export const [PitchMapProvider, usePitchMap] = buildContext(() => {
   const isRecording = useInterfaceState(state => state.isRecording);
   const pointer = useRef(0);
-  const [pitchMap] = useState(() => new Float32Array(RECORD_SIZE));
-  const latestPendingPitch = useRef<number | null>(null);
+  const [chromaMap] = useState(() => new Float32Array(RECORD_SIZE));
+  const latestPendingChroma = useRef<number | null>(null);
 
-  const updatePitch = useCallback((nextPitch: number) => {
-    latestPendingPitch.current = nextPitch;
+  const updateChroma = useCallback((nextPitch: number) => {
+    latestPendingChroma.current = nextPitch;
   }, []);
 
   const readPitch = useLatestCallback(() => {
-    if (latestPendingPitch.current !== null) {
-      return latestPendingPitch.current;
-    }
+    const chroma =
+      latestPendingChroma.current !== null
+        ? latestPendingChroma.current
+        : chromaMap[~~pointer.current];
 
-    return pitchMap[~~pointer.current];
+    return 440 * Math.pow(2, (chroma + 48 - 69) / 12);
   });
 
   const [pitchTexture, setPitchTexture] = useState<HTMLCanvasElement | null>(null);
@@ -74,9 +75,9 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
     []
   );
 
-  const writePitchInternal = useCallback(
-    (pitch: number, intPointer: number) => {
-      pitchMap[intPointer] = pitch;
+  const writeChromaInternal = useCallback(
+    (chroma: number, intPointer: number) => {
+      chromaMap[intPointer] = chroma;
       if (!ctx) {
         return;
       }
@@ -86,13 +87,13 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
 
       ctx.beginPath();
       ctx.arc(TEXTURE_SIZE / 2, TEXTURE_SIZE / 2, TEXTURE_RADIUS, angle, angleNext);
-      ctx.strokeStyle = PITCH_COLORS[pitch];
+      ctx.strokeStyle = CHROMA_COLORS[chroma];
       ctx.lineCap = 'round';
       ctx.lineWidth = 5;
       ctx.stroke();
       subscriptions.forEach(subscription => subscription());
     },
-    [pitchMap, ctx]
+    [chromaMap, ctx]
   );
 
   const { effectiveSpeed, onAdvance: onUpdateSpeed } = useEffectiveSpeed();
@@ -100,8 +101,8 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
     const nextPointer = (pointer.current + POINTER_ADVANCE) % RECORD_SIZE;
     const prevIntPointer = ~~pointer.current;
     if (prevIntPointer !== ~~nextPointer) {
-      if (latestPendingPitch.current !== null) {
-        writePitchInternal(latestPendingPitch.current, prevIntPointer);
+      if (latestPendingChroma.current !== null) {
+        writeChromaInternal(latestPendingChroma.current, prevIntPointer);
         // Just keep write until new pitch arrives
         // latestPendingPitch.current = null;
       }
@@ -114,7 +115,7 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
 
   useEffect(() => {
     if (!isRecording) {
-      latestPendingPitch.current = null;
+      latestPendingChroma.current = null;
     }
   }, [isRecording]);
 
@@ -126,10 +127,9 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
     getPointerAngle,
 
     // Pitch
-    pitchMap,
     pitchTexture,
     subscribePitchTexture,
-    updatePitch,
     readPitch,
+    updateChroma,
   };
 });

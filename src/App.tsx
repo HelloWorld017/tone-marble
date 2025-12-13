@@ -4,7 +4,7 @@ import {
   AudioContextClickInitializer,
   AudioContextProvider,
 } from './components/audio/AudioContextProvider';
-import { PitchDetector } from './components/audio/PitchDetector';
+import { ChromaDetector } from './components/audio/ChromaDetector';
 import { SynthesizeProvider } from './components/audio/SynthesizeProvider';
 import { SynthesizeRhythm } from './components/audio/SynthesizeRhythm';
 import { ControllerProvider } from './components/providers/ControllerProvider';
@@ -23,7 +23,7 @@ const AppProviders = ({ children }: { children: ReactNode }) => (
       <ControllerProvider>
         <InterfaceStateProvider>
           <PitchMapProvider>
-            <PitchDetector />
+            <ChromaDetector />
             <SynthesizeProvider>
               <SynthesizeRhythm />
               {children}
