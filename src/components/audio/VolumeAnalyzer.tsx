@@ -21,9 +21,8 @@ export const VolumeAnalyzer = ({ onVolume }: { onVolume: (volume: number) => voi
       }
     }, 100);
 
-    const volumeAnalyzerPromise = createVolumeAnalyzer(ctx, ({ peak }) => {
-      const volumeMapped = Math.min(1, peak / 0.3);
-      onVolumeLatest(volumeMapped);
+    const volumeAnalyzerPromise = createVolumeAnalyzer(ctx, ({ mean }) => {
+      onVolumeLatest(mean);
       lastAnalyze.current = performance.now();
     });
 

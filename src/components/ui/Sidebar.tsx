@@ -1,17 +1,23 @@
 import { animated, useTransition as useSpringTransition } from '@react-spring/web';
 import { useEffect, useRef, useState } from 'react';
-import { IconGamepad } from '@/assets/icons/lucide';
+import { IconCog, IconGamepad } from '@/assets/icons/lucide';
 import { useLatestRef } from '@/hooks/useLatestRef';
 import * as styles from './Sidebar.css';
+import { Config } from './config/Config';
 import { Controllers } from './controllers/Controllers';
 import type { ReactNode } from 'react';
 
-type TabKind = 'controllers';
+type TabKind = 'controllers' | 'config';
 
 const TABS: Record<TabKind, { icon: ReactNode; element: ReactNode }> = {
   controllers: {
     icon: <IconGamepad strokeWidth={2} />,
     element: <Controllers />,
+  },
+
+  config: {
+    icon: <IconCog strokeWidth={2} />,
+    element: <Config />,
   },
 };
 

@@ -1,6 +1,6 @@
 import { css, Global, ThemeProvider } from '@emotion/react';
 import { Peer } from 'peerjs';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { PEER_ID_PREFIX } from './constants';
 import { DEFAULT_THEME } from './constants/theme';

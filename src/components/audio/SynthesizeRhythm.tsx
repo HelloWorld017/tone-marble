@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { createCrakleGenerator } from '@/utils/crakleGenerator';
 import { usePitchMap } from '../providers/PitchMapProvider';
 import { useAudioContext } from './AudioContextProvider';
@@ -9,6 +10,7 @@ import { useConnectNode } from './hooks/useConnectNode';
 import { useGain } from './hooks/useGain';
 import { createPinkNoiseBuffer } from './utils/createPinkNoiseBuffer';
 import { createWhiteNoiseBuffer } from './utils/createWhiteNoiseBuffer';
+import { updatePannerForPosition } from './utils/updatePannerForPosition';
 
 const WHITENOISE_BUFFER_SIZE = 2;
 const PINKNOISE_BUFFER_SIZE = 10;
@@ -28,15 +30,6 @@ export const SynthesizeRhythm = () => {
   /* Lo-Fi Vinyl Scratch Synthesizer */
   const loFiOut = useGain({ gain: 1 }, analyzerOut);
   useConnectNode(loFiOut, destinationOut);
-
-  const addEffect = useSynthesize(state => state.addEffect);
-  const filterOut = useGain({ gain: 1 }, null);
-  const filterGainPassThru = useGain({ gain: 1 }, filterOut);
-  const filterGain = useGain({ gain: 0 }, filterOut);
-  const filterHandle = useBiquadFilter({ type: 'lowpass', frequency: 1200, Q: 0 }, filterGain);
-  const filterIn = useGain({ gain: 1 }, filterGainPassThru);
-  useConnectNode(filterIn, filterHandle);
-  useEffect(() => addEffect(filterIn, filterOut), [filterIn, filterOut]);
 
   const hissGain = useGain({ gain: 0.01 }, loFiOut);
   const hiss = useBufferSource({ loop: true }, hissGain);
@@ -67,9 +60,96 @@ export const SynthesizeRhythm = () => {
 
   useConnectNode(crakle, crakleGain);
 
+  /* Kick and Hi-Hat Synthesizer */
+  const rhythmOut = useGain({ gain: 1 }, analyzerOut);
+  useConnectNode(rhythmOut, destinationOut);
+
+  const synthesizeKick = useLatestCallback(() => {
+    if (!ctx || !rhythmOut) {
+      return;
+    }
+
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const panner = ctx.createPanner();
+
+    osc.frequency.setValueAtTime(144, t);
+    osc.frequency.exponentialRampToValueAtTime(1, t + 0.5);
+    gain.gain.setValueAtTime(1, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+
+    updatePannerForPosition(panner, [0, 0, 0]);
+    panner.rolloffFactor = 0.2;
+
+    osc.connect(gain);
+    gain.connect(panner);
+    panner.connect(rhythmOut);
+
+    osc.start(t);
+    osc.stop(t + 0.5);
+  });
+
+  const synthesizeHiHat = useLatestCallback(() => {
+    if (!ctx || !rhythmOut) {
+      return;
+    }
+
+    const t = ctx.currentTime;
+    const source = ctx.createBufferSource();
+    source.buffer = whiteNoise;
+    source.loop = true;
+    source.loopStart = Math.random() * (WHITENOISE_BUFFER_SIZE - 0.7);
+    source.loopEnd = source.loopStart + 0.6;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 5000;
+
+    const gain = ctx.createGain();
+    const panner = ctx.createPanner();
+
+    gain.gain.setValueAtTime(0.6, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+
+    updatePannerForPosition(panner, [0, 0, 0]);
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(panner);
+    panner.connect(rhythmOut);
+
+    source.start(t);
+    source.stop(t + 0.05);
+  });
+
   const effectiveSpeed = usePitchMap(state => state.effectiveSpeed);
   useEffect(() => {
-    if (!ctx || !loFiOut) {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let isUpBeat = false;
+
+    const play = () => {
+      if (isUpBeat) {
+        synthesizeKick();
+      }
+
+      synthesizeHiHat();
+      isUpBeat = !isUpBeat;
+
+      const currentSpeed = Math.max(effectiveSpeed.current, 10);
+      timeoutId = setTimeout(play, 1000 * (30 / currentSpeed));
+    };
+
+    play();
+    return () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [effectiveSpeed, synthesizeKick, synthesizeHiHat]);
+
+  useEffect(() => {
+    if (!ctx || !loFiOut || !rhythmOut) {
       return () => {};
     }
 
@@ -77,13 +157,13 @@ export const SynthesizeRhythm = () => {
     const intervalId = setInterval(() => {
       const blendRate = Math.max(-50, Math.min(effectiveSpeed.current - 50, 50)) / 100 + 0.5;
       const loFiVolume = effectiveSpeed.current < 10 ? 0 : 1 - blendRate;
+      const rhythmVolume = effectiveSpeed.current < 10 ? 0 : blendRate;
       loFiOut.gain.linearRampToValueAtTime(loFiVolume, t + 0.15);
-      filterGain?.gain.linearRampToValueAtTime(loFiVolume, t + 0.15);
-      filterGainPassThru?.gain.linearRampToValueAtTime(1 - loFiVolume, t + 0.15);
+      rhythmOut.gain.linearRampToValueAtTime(rhythmVolume, t + 0.15);
     }, 150);
 
     return () => clearInterval(intervalId);
-  }, [ctx, loFiOut, filterGain, filterGainPassThru, effectiveSpeed]);
+  }, [ctx, loFiOut, effectiveSpeed]);
 
   return <></>;
 };

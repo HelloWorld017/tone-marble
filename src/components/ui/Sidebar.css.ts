@@ -25,9 +25,11 @@ export const asideItemStyle = (isActive: boolean) => (theme: Theme) => css`
   border-radius: 0.2rem;
   padding: 0.6rem;
   color: ${theme.colors.fillPrimary};
-  border: 1px solid ${theme.colors.fillLine};
+  border: 1px solid ${isActive ? theme.colors.fillLine : 'transparent'};
   background: ${isActive ? theme.colors.bgElevated : theme.colors.bgBase};
-  transition: all 0.4s ${theme.easings.default};
+  transition:
+    background ${theme.easings.default},
+    border-color ${theme.easings.default};
   font-size: 2rem;
 `;
 
@@ -35,7 +37,7 @@ export const contentsStyle = (theme: Theme) => css`
   position: fixed;
   top: 1.6rem;
   left: 7.6rem;
-  max-width: 36rem;
+  width: 30rem;
 
   background: ${theme.colors.bgBase};
   border-radius: 0.8rem;

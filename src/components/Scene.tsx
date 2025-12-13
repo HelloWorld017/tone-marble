@@ -1,4 +1,12 @@
-import { Cloud, Clouds, Environment, Html, OrbitControls, useProgress } from '@react-three/drei';
+import {
+  Cloud,
+  Clouds,
+  Environment,
+  Html,
+  OrbitControls,
+  PerspectiveCamera,
+  useProgress,
+} from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Bloom,
@@ -67,7 +75,7 @@ const SceneObjects = () => (
     <Case />
     <Physics gravity={[0, -20, 0]} interpolate={false}>
       <Frame planeWidth={10} planeHeight={32} planeAngle={-5 * DEG2RAD} height={20} />
-      <Pillars planeAngle={-5 * DEG2RAD} rows={20} columns={6} />
+      <Pillars planeAngle={-5 * DEG2RAD} rows={18} columns={6} />
       <Marbles spawnX={-12} spawnY={5} />
     </Physics>
   </>
@@ -152,7 +160,8 @@ const RaycastWhenCameraMoves = () => {
 
 export const Scene = () => (
   <div style={{ width: '100vw', height: '100vh' }}>
-    <Canvas shadows camera={{ position: [0, 0, 30], fov: 50 }} flat>
+    <Canvas shadows flat>
+      <PerspectiveCamera makeDefault position={[0, 0, 30]} fov={50} near={0.1} far={500} />
       <Suspense fallback={<SceneProgress />}>
         <color attach="background" args={['#c0c0c0']} />
         <SceneAudioListener />

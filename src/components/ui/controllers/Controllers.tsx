@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { IconX } from '@/assets/icons/lucide';
+import { IconLinkOff } from '@/assets/icons/lucide';
 import { useController } from '@/components/providers/ControllerProvider';
 import { useAnimationFrame } from '@/hooks/useAnimationFrame';
 import * as styles from './Controllers.css';
@@ -57,7 +57,7 @@ const DeviceConnected = () => {
       <div css={styles.headerStyle}>
         <div css={styles.statusStyle(true)}>Connected</div>
         <button css={styles.disconnectStyle} onClick={disconnect} type="button">
-          <IconX />
+          <IconLinkOff />
         </button>
       </div>
       <FlowRateControl />

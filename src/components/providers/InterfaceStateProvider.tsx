@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
+import type { PitchModelKind } from '@/utils/pitchDetector';
 import type { CSSProperties } from 'react';
 
 export type InterfaceKind = 'click' | 'xy' | 'x';
@@ -56,6 +57,8 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
   const [radius, setRadius] = useState(0);
   const [volume, setVolume] = useState(1);
 
+  const [pitchModelKind, setPitchModelKind] = useState<PitchModelKind | 'fft'>('crepe');
+
   return {
     // Cursor Management
     hoverTarget,
@@ -87,5 +90,9 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
     // Sliders
     volume,
     setVolume,
+
+    // UI
+    pitchModelKind,
+    setPitchModelKind,
   };
 });

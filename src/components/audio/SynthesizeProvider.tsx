@@ -7,11 +7,11 @@ import { useConnectNodeChain } from './hooks/useConnectNode';
 import { useDynamicsCompressor } from './hooks/useDynamicsCompressor';
 import { useGain } from './hooks/useGain';
 import { createWhiteNoiseBuffer } from './utils/createWhiteNoiseBuffer';
+import { updatePannerForPosition } from './utils/updatePannerForPosition';
 
 type Position = [number, number, number];
 
 const MAX_VOICES = 100;
-const MAX_DISTANCE = 100;
 const HARMONIC_RATIOS = [0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0];
 const WHITENOISE_BUFFER_SIZE = 10;
 
@@ -98,23 +98,13 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     ctx.listener.positionZ.value = position[2];
   });
 
-  const updatePannerForPosition = useLatestCallback((panner: PannerNode, position: Position) => {
-    panner.panningModel = 'equalpower';
-    panner.distanceModel = 'inverse';
-    panner.refDistance = 1;
-    panner.maxDistance = MAX_DISTANCE;
-    panner.positionX.value = position[0];
-    panner.positionY.value = position[1];
-    panner.positionZ.value = position[2];
-  });
-
   const readBaseFrequency = useLatestCallback(
     () => 440 * Math.pow(2, (readPitch() + 48 - 69) / 12)
   );
 
   /* Sine-based Synthesizer */
   const synthesizeSine = useLatestCallback((position: Position, gain: number) => {
-    if (!ctx || !destinationOut) {
+    if (!ctx || !destinationOut || !analyzerOut) {
       return;
     }
 
@@ -142,6 +132,7 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
 
     osc.connect(envelope);
     envelope.connect(panner);
+    envelope.connect(analyzerOut);
     panner.connect(destinationOut);
     activeVoices.current++;
 

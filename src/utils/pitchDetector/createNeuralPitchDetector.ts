@@ -101,6 +101,21 @@ type CreateNeuralPitchDetectorProps = {
   modelKind?: PitchModelKind;
 };
 
+const loadModel = (modelKind: PitchModelKind) =>
+  tf
+    .ready()
+    .then(
+      (): Promise<tf.LayersModel | tf.GraphModel> =>
+        modelKind === 'crepe'
+          ? tf.loadLayersModel('/assets/neuralnets/crepe/model.json')
+          : tf.loadGraphModel('/assets/neuralnets/spice/model.json')
+    );
+
+let modelPromise = {
+  kind: 'crepe' as PitchModelKind,
+  promise: loadModel('crepe'),
+};
+
 export const createNeuralPitchDetector = async (
   ctx: AudioContext,
   callback: (result: PitchResult) => void,
@@ -111,16 +126,11 @@ export const createNeuralPitchDetector = async (
     : ctx.audioWorklet.addModule(sampleProcessorWorklet).then(() => workletEnabledContext.add(ctx));
 
   const modelKind = opts?.modelKind ?? 'crepe';
-  const modelPromise = tf
-    .ready()
-    .then(
-      (): Promise<tf.LayersModel | tf.GraphModel> =>
-        modelKind === 'spice'
-          ? tf.loadGraphModel('/assets/neuralnets/spice/model.json')
-          : tf.loadLayersModel('/assets/neuralnets/crepe/model.json')
-    );
+  if (modelPromise.kind !== modelKind) {
+    modelPromise = { kind: modelKind, promise: loadModel(modelKind) };
+  }
 
-  const [model] = await Promise.all([modelPromise, audioWorkletPromise]);
+  const [model] = await Promise.all([modelPromise.promise, audioWorkletPromise]);
 
   const predict = async (audioData: Float32Array) => {
     if (modelKind === 'spice') {
