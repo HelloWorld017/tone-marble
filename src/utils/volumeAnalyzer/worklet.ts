@@ -1,6 +1,7 @@
 class VolumeProcessor extends AudioWorkletProcessor {
   private lastUpdate: number = 0;
-  private volume: number = 0;
+  private mean: number = 0;
+  private peak: number = 0;
   private readonly updateInterval: number;
 
   constructor() {
@@ -17,15 +18,19 @@ class VolumeProcessor extends AudioWorkletProcessor {
     const inputChannel = input[0];
 
     let sum = 0;
+    let peak = 0;
     for (let i = 0; i < inputChannel.length; i++) {
+      const absolute = Math.abs(inputChannel[i]);
+      peak = absolute < peak ? peak : absolute;
       sum += inputChannel[i] * inputChannel[i];
     }
 
     const rms = Math.sqrt(sum / inputChannel.length);
-    this.volume = this.volume * 0.75 + rms * 0.25;
+    this.mean = this.mean * 0.75 + rms * 0.25;
+    this.peak = this.peak * 0.75 + peak * 0.25;
 
     if (this.lastUpdate + this.updateInterval <= currentTime * sampleRate) {
-      this.port.postMessage({ volume: this.volume });
+      this.port.postMessage({ mean: this.mean, peak: this.peak });
       this.lastUpdate = currentTime;
     }
 

@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
+import { usePitchMap } from '@/components/providers/PitchMapProvider';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
-import { usePitchMap } from '../PitchMapProvider';
 import { useAudioContext } from './AudioContextProvider';
 import { useDynamicsCompressor } from './hooks/useDynamicsCompressor';
 import { useGain } from './hooks/useGain';
@@ -126,7 +126,7 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     const attack = 0.01;
     const decay = 0.1 + gain * 0.2;
     envelope.gain.setValueAtTime(0, t);
-    envelope.gain.linearRampToValueAtTime(gain, t + attack);
+    envelope.gain.linearRampToValueAtTime(Math.min(1, gain * 3), t + attack);
     envelope.gain.exponentialRampToValueAtTime(0.001, t + attack + decay);
 
     updatePannerForPosition(panner, position);
@@ -176,7 +176,7 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     const attack = 0.05 + Math.random() * 0.05;
     const decay = 0.2 + gain * 0.5;
     envelope.gain.setValueAtTime(0, t);
-    envelope.gain.linearRampToValueAtTime(gain * 0.05, t + attack);
+    envelope.gain.linearRampToValueAtTime(gain * 0.15, t + attack);
     envelope.gain.linearRampToValueAtTime(0, t + attack + decay);
 
     updatePannerForPosition(panner, position);

@@ -1,3 +1,6 @@
+import 'pretendard-jp/dist/web/static/PretendardJP-Regular.css';
+import 'pretendard-jp/dist/web/static/PretendardJP-SemiBold.css';
+
 import { css } from '@emotion/react';
 
 export const globalStyle = css`
@@ -17,7 +20,8 @@ export const globalStyle = css`
   }
 
   :root {
-    font-size: 12px;
+    font-size: 10px;
+    font-family: 'Pretendard JP', sans-serif;
     cursor: default;
   }
 

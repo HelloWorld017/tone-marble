@@ -1,7 +1,8 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { POINTER_ADVANCE, RECORD_SIZE } from '@/constants';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
+import { useInterfaceState } from './InterfaceStateProvider';
 
 const TEXTURE_SIZE = 512;
 const TEXTURE_RADIUS = 192;
@@ -10,6 +11,7 @@ const PITCH_COLORS = Array.from({ length: 12 }).map(
 );
 
 export const [PitchMapProvider, usePitchMap] = buildContext(() => {
+  const isRecording = useInterfaceState(state => state.isRecording);
   const pointer = useRef(0);
   const [pitchMap] = useState(() => new Float32Array(RECORD_SIZE));
   const latestPendingPitch = useRef<number | null>(null);
@@ -82,6 +84,12 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
 
     pointer.current = nextPointer;
   });
+
+  useEffect(() => {
+    if (!isRecording) {
+      latestPendingPitch.current = null;
+    }
+  }, [isRecording]);
 
   return {
     pointer,

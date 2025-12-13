@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useInterfaceState } from '../InterfaceStateProvider';
-import { usePitchMap } from '../PitchMapProvider';
+import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
+import { usePitchMap } from '@/components/providers/PitchMapProvider';
 import { useMicrophone } from './hooks/useMicrophone';
 import { usePitchDetector } from './hooks/usePitchDetector';
 import type { PitchResult } from '@/utils/pitchDetector';

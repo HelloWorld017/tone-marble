@@ -1,9 +1,9 @@
 import { Instance, Instances } from '@react-three/drei';
 import { CapsuleCollider, RigidBody } from '@react-three/rapier';
 import { useMemo } from 'react';
+import { useSynthesize } from '@/components/audio/SynthesizeProvider';
+import { usePitchMap } from '@/components/providers/PitchMapProvider';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
-import { usePitchMap } from '../PitchMapProvider';
-import { useSynthesize } from '../audio/SynthesizeProvider';
 import type { ContactForceHandler } from '@react-three/rapier';
 
 const MAX_COLLISION_FORCE = 20;

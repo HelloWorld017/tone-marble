@@ -2,8 +2,9 @@ import { useFrame } from '@react-three/fiber';
 import { InstancedRigidBodies, type RapierRigidBody } from '@react-three/rapier';
 import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Matrix4, Vector3 } from 'three';
+import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
-import { useInterfaceState } from '../InterfaceStateProvider';
+import { useController } from '../providers/ControllerProvider';
 import type { Ref } from 'react';
 import type { InstancedMesh } from 'three';
 
@@ -134,18 +135,26 @@ export const Marbles = ({
     meshRef.current.instanceMatrix.needsUpdate = true;
   });
 
+  const readFlowRate = useController(state => state.readFlowRate);
   useEffect(() => {
     if (!automatic) {
       return () => {};
     }
 
+    let lastSpawn = 0;
     const intervalId = setInterval(() => {
       if (!meshRef.current || !bodiesRef.current) {
         return;
       }
 
+      if (lastSpawn < (1.07 - readFlowRate()) * 100) {
+        lastSpawn++;
+        return;
+      }
+
       spawnMarble();
-    }, 100);
+      lastSpawn = 0;
+    }, 15);
 
     return () => clearInterval(intervalId);
   }, [automatic, isPoweredOn, spawnMarble]);

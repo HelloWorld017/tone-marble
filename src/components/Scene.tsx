@@ -15,21 +15,15 @@ import {
   Vector2,
   Matrix4,
 } from 'three';
-import {
-  AudioContextClickInitializer,
-  AudioContextProvider,
-  useAudioContext,
-} from './audio/AudioContextProvider';
-import { PitchDetector } from './audio/PitchDetector';
-import { SynthesizeProvider, useSynthesize } from './audio/SynthesizeProvider';
+import { DEG2RAD } from '@/constants';
+import { useAudioContext } from './audio/AudioContextProvider';
+import { useSynthesize } from './audio/SynthesizeProvider';
 import { useFluorescentBlink } from './hooks/useFluorescentBlink';
 import { Case } from './objects/Case';
 import { Frame } from './objects/Frame';
 import { Marbles } from './objects/Marbles';
 import { Pillars } from './objects/Pillars';
-import { InterfaceStateProvider, useInterfaceState } from './providers/InterfaceStateProvider';
-import { PitchMapProvider } from './providers/PitchMapProvider';
-import type { ReactNode } from 'react';
+import { useInterfaceState } from './providers/InterfaceStateProvider';
 
 const SceneEnvironment = () => {
   const isPoweredOn = useInterfaceState(state => state.isPoweredOn);
@@ -72,8 +66,8 @@ const SceneObjects = () => (
   <>
     <Case />
     <Physics gravity={[0, -20, 0]} interpolate={false}>
-      <Frame planeWidth={10} planeHeight={32} planeAngle={-5 * (Math.PI / 180)} height={20} />
-      <Pillars planeAngle={-5 * (Math.PI / 180)} rows={20} columns={6} />
+      <Frame planeWidth={10} planeHeight={32} planeAngle={-5 * DEG2RAD} height={20} />
+      <Pillars planeAngle={-5 * DEG2RAD} rows={20} columns={6} />
       <Marbles spawnX={-12} spawnY={5} />
     </Physics>
   </>
@@ -153,32 +147,18 @@ const RaycastWhenCameraMoves = () => {
   return <></>;
 };
 
-const Providers = ({ children }: { children: ReactNode }) => (
-  <AudioContextProvider>
-    <InterfaceStateProvider>
-      <PitchMapProvider>
-        <SynthesizeProvider>{children}</SynthesizeProvider>
-      </PitchMapProvider>
-    </InterfaceStateProvider>
-  </AudioContextProvider>
-);
-
 export const Scene = () => (
-  <Providers>
-    <AudioContextClickInitializer />
-    <PitchDetector />
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <Canvas shadows camera={{ position: [0, 0, 30], fov: 50 }} flat>
-        <Suspense fallback={<SceneProgress />}>
-          <color attach="background" args={['#c0c0c0']} />
-          <SceneAudioListener />
-          <SceneEffects />
-          <SceneEnvironment />
-          <SceneObjects />
-          <SceneOrbitControls />
-        </Suspense>
-        <RaycastWhenCameraMoves />
-      </Canvas>
-    </div>
-  </Providers>
+  <div style={{ width: '100vw', height: '100vh' }}>
+    <Canvas shadows camera={{ position: [0, 0, 30], fov: 50 }} flat>
+      <Suspense fallback={<SceneProgress />}>
+        <color attach="background" args={['#c0c0c0']} />
+        <SceneAudioListener />
+        <SceneEffects />
+        <SceneEnvironment />
+        <SceneObjects />
+        <SceneOrbitControls />
+      </Suspense>
+      <RaycastWhenCameraMoves />
+    </Canvas>
+  </div>
 );

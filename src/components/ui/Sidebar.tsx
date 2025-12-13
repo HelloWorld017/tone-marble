@@ -1,0 +1,77 @@
+import { animated, useTransition as useSpringTransition } from '@react-spring/web';
+import { useEffect, useRef, useState } from 'react';
+import { IconGamepad } from '@/assets/icons/lucide';
+import { useLatestRef } from '@/hooks/useLatestRef';
+import * as styles from './Sidebar.css';
+import { Controllers } from './controllers/Controllers';
+import type { ReactNode } from 'react';
+
+type TabKind = 'controllers';
+
+const TABS: Record<TabKind, { icon: ReactNode; element: ReactNode }> = {
+  controllers: {
+    icon: <IconGamepad strokeWidth={2} />,
+    element: <Controllers />,
+  },
+};
+
+export const Sidebar = () => {
+  const [selectedTab, setSelectedTab] = useState<TabKind | null>(null);
+  const selectedTabRef = useLatestRef(selectedTab);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const onClickOutside = (e: PointerEvent) => {
+      if (rootRef.current === null || !(e.target instanceof Node)) {
+        return;
+      }
+
+      if (selectedTabRef.current === null) {
+        return;
+      }
+
+      if (!rootRef.current.contains(e.target)) {
+        setSelectedTab(null);
+      }
+    };
+    window.addEventListener('click', onClickOutside, { capture: true });
+    return () => window.removeEventListener('click', onClickOutside, { capture: true });
+  }, [selectedTabRef]);
+
+  const transitions = useSpringTransition([selectedTab], {
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
+    keys: kind => kind ?? '',
+  });
+
+  return (
+    <div ref={rootRef}>
+      <aside css={styles.asideStyle}>
+        {Object.entries(TABS).map(([key, { icon }]) => (
+          <button
+            key={key}
+            css={styles.asideItemStyle(selectedTab === key)}
+            type="button"
+            onClick={() =>
+              selectedTab === key ? setSelectedTab(null) : setSelectedTab(key as TabKind)
+            }
+          >
+            {icon}
+          </button>
+        ))}
+      </aside>
+
+      <main>
+        {transitions(
+          (style, kind) =>
+            kind && (
+              <animated.div css={styles.contentsStyle} style={style}>
+                {TABS[kind].element}
+              </animated.div>
+            )
+        )}
+      </main>
+    </div>
+  );
+};

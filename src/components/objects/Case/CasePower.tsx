@@ -1,11 +1,14 @@
 import { animated, useSpring } from '@react-spring/three';
 import { useLoader } from '@react-three/fiber';
-import { useEffect, useState } from 'react';
+import { throttle } from 'es-toolkit';
+import { useEffect, useMemo, useState } from 'react';
 import { AudioLoader } from 'three';
 import UindowsBootSound from '@/assets/audio/uindows-boot.mp3?url';
 import UindowsOffSound from '@/assets/audio/uindows-off.mp3?url';
-import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { useSynthesize } from '@/components/audio/SynthesizeProvider';
+import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
+import { DEG2RAD } from '@/constants';
+import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { useHover } from './hooks/useHover';
 import type { AnimatedSimple } from '@/types/AnimatedSimple';
 import type { GLTFResult } from '@/types/GLTFResult';
@@ -29,17 +32,20 @@ export const CasePower = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
   const uindowsBootSoundBuffer = useLoader(AudioLoader, UindowsBootSound);
   const uindowsOffSoundBuffer = useLoader(AudioLoader, UindowsOffSound);
 
+  const togglePowerUpDown = useLatestCallback(() => {
+    setTimeout(() => {
+      playAudio(isPoweredOnInternal ? uindowsOffSoundBuffer : uindowsBootSoundBuffer);
+      setIsPoweredOnInternal(!isPoweredOnInternal);
+    }, 300);
+  });
+
+  const togglePowerUpDownThrottled = useMemo(() => throttle(togglePowerUpDown, 3000), []);
   const { groupProps } = useHover({
-    onPointerUpActive: () => {
-      setTimeout(() => {
-        playAudio(isPoweredOnInternal ? uindowsOffSoundBuffer : uindowsBootSoundBuffer);
-        setIsPoweredOnInternal(!isPoweredOnInternal);
-      }, 300);
-    },
+    onPointerUpActive: togglePowerUpDownThrottled,
   });
 
   const { rotateY, translationX } = useSpring({
-    rotateY: isPoweredOnInternal ? (-10 / 180) * Math.PI : 0,
+    rotateY: isPoweredOnInternal ? -10 * DEG2RAD : 0,
     translationX: isPoweredOnInternal ? 0.1 : 0,
     config: { mass: 1, tension: 170, friction: 26 },
   });

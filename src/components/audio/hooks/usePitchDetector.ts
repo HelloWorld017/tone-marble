@@ -34,6 +34,12 @@ export const usePitchDetector = (
     }
 
     from?.connect(pitchDetector);
-    return () => from?.disconnect(pitchDetector);
+    return () => {
+      try {
+        from?.disconnect(pitchDetector);
+      } catch {
+        /* when the input is gone */
+      }
+    };
   }, [from, pitchDetector]);
 };
