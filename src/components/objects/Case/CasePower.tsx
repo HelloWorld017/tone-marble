@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { AudioLoader } from 'three';
 import UindowsBootSound from '@/assets/audio/uindows-boot.mp3?url';
 import UindowsOffSound from '@/assets/audio/uindows-off.mp3?url';
-import { useInterfaceState } from '@/components/InterfaceStateProvider';
+import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { useSynthesize } from '@/components/audio/SynthesizeProvider';
 import { useHover } from './hooks/useHover';
 import type { AnimatedSimple } from '@/types/AnimatedSimple';

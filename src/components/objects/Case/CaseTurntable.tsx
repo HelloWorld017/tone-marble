@@ -1,8 +1,8 @@
 import { animated } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
-import { useInterfaceState } from '@/components/InterfaceStateProvider';
-import { usePitchMap } from '@/components/PitchMapProvider';
+import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
+import { usePitchMap } from '@/components/providers/PitchMapProvider';
 import { useToggleButton } from './hooks/useToggleButton';
 import type { AnimatedSimple } from '@/types/AnimatedSimple';
 import type { GLTFResult } from '@/types/GLTFResult';

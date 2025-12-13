@@ -1,56 +1,16 @@
 import { animated, useSpringValue } from '@react-spring/three';
-import { useEffect, useRef } from 'react';
-import { useAudioContext } from '@/components/audio/AudioContextProvider';
-import { useSynthesize } from '@/components/audio/SynthesizeProvider';
-import { createVolumeAnalyzer } from '@/utils/volumeAnalyzer';
+import { VolumeAnalyzer } from '@/components/audio/VolumeAnalyzer';
 import type { AnimatedSimple } from '@/types/AnimatedSimple';
 import type { GLTFResult } from '@/types/GLTFResult';
 
 const a = animated as unknown as AnimatedSimple;
 
 export const CaseIndicator = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'materials'>) => {
-  const ctx = useAudioContext();
-  const analyzerOut = useSynthesize(state => state.analyzerOut);
   const volumeSpring = useSpringValue(0);
-  const lastAnalyze = useRef(0);
-
-  useEffect(() => {
-    if (!ctx || !analyzerOut) {
-      return;
-    }
-
-    const intervalId = setInterval(() => {
-      if (performance.now() - lastAnalyze.current > 75) {
-        void volumeSpring.start(0);
-      }
-    }, 100);
-
-    const volumeAnalyzerPromise = createVolumeAnalyzer(ctx, volume => {
-      const volumeMapped = Math.min(1, volume / 0.3);
-      void volumeSpring.start(volumeMapped);
-      lastAnalyze.current = performance.now();
-    });
-
-    let isCanceled = false;
-    let volumeAnalyzerNode: AudioNode | null = null;
-    void volumeAnalyzerPromise.then(volumeAnalyzer => {
-      if (!isCanceled) {
-        volumeAnalyzerNode = volumeAnalyzer;
-        analyzerOut.connect(volumeAnalyzer);
-      }
-    });
-
-    return () => {
-      isCanceled = true;
-      clearInterval(intervalId);
-      if (volumeAnalyzerNode) {
-        analyzerOut.disconnect(volumeAnalyzerNode);
-      }
-    };
-  }, [ctx, analyzerOut]);
 
   return (
     <group position={[0, 0.5, -5.8]}>
+      <VolumeAnalyzer onVolume={volume => void volumeSpring.start(volume)} />
       <a.primitive
         object={nodes.IndicatorBaseBone}
         scale-y={volumeSpring.to(y => Math.min(y, 0.8) / 0.8)}

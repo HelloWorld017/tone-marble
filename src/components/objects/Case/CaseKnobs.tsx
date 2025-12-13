@@ -1,5 +1,5 @@
 import { animated } from '@react-spring/three';
-import { useInterfaceState } from '@/components/InterfaceStateProvider';
+import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { useKnob } from './hooks/useKnob';
 import type { AnimatedSimple } from '@/types/AnimatedSimple';
 import type { GLTFResult } from '@/types/GLTFResult';

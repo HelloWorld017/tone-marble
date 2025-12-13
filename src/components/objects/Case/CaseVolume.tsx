@@ -1,5 +1,5 @@
 import { animated } from '@react-spring/three';
-import { useInterfaceState } from '@/components/InterfaceStateProvider';
+import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { useSlider } from './hooks/useSlider';
 import { useToggleButton } from './hooks/useToggleButton';
 import type { AnimatedSimple } from '@/types/AnimatedSimple';

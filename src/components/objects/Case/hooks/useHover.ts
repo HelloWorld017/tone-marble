@@ -1,6 +1,6 @@
 import { useEffect, useId } from 'react';
-import { useInterfaceState } from '@/components/InterfaceStateProvider';
-import type { InterfaceKind } from '@/components/InterfaceStateProvider';
+import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
+import type { InterfaceKind } from '@/components/providers/InterfaceStateProvider';
 import type { ThreeEvent } from '@react-three/fiber';
 
 type PointerEventHandler = (event: ThreeEvent<PointerEvent>) => void;

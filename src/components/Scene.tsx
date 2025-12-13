@@ -15,8 +15,6 @@ import {
   Vector2,
   Matrix4,
 } from 'three';
-import { InterfaceStateProvider, useInterfaceState } from './InterfaceStateProvider';
-import { PitchMapProvider } from './PitchMapProvider';
 import {
   AudioContextClickInitializer,
   AudioContextProvider,
@@ -29,6 +27,9 @@ import { Case } from './objects/Case';
 import { Frame } from './objects/Frame';
 import { Marbles } from './objects/Marbles';
 import { Pillars } from './objects/Pillars';
+import { InterfaceStateProvider, useInterfaceState } from './providers/InterfaceStateProvider';
+import { PitchMapProvider } from './providers/PitchMapProvider';
+import type { ReactNode } from 'react';
 
 const SceneEnvironment = () => {
   const isPoweredOn = useInterfaceState(state => state.isPoweredOn);
@@ -152,28 +153,32 @@ const RaycastWhenCameraMoves = () => {
   return <></>;
 };
 
-export const Scene = () => (
+const Providers = ({ children }: { children: ReactNode }) => (
   <AudioContextProvider>
-    <AudioContextClickInitializer />
     <InterfaceStateProvider>
       <PitchMapProvider>
-        <SynthesizeProvider>
-          <div style={{ width: '100vw', height: '100vh' }}>
-            <Canvas shadows camera={{ position: [0, 0, 30], fov: 50 }} flat>
-              <Suspense fallback={<SceneProgress />}>
-                <color attach="background" args={['#c0c0c0']} />
-                <SceneAudioListener />
-                <SceneEffects />
-                <SceneEnvironment />
-                <SceneObjects />
-                <SceneOrbitControls />
-              </Suspense>
-              <RaycastWhenCameraMoves />
-            </Canvas>
-          </div>
-        </SynthesizeProvider>
-        <PitchDetector />
+        <SynthesizeProvider>{children}</SynthesizeProvider>
       </PitchMapProvider>
     </InterfaceStateProvider>
   </AudioContextProvider>
+);
+
+export const Scene = () => (
+  <Providers>
+    <AudioContextClickInitializer />
+    <PitchDetector />
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <Canvas shadows camera={{ position: [0, 0, 30], fov: 50 }} flat>
+        <Suspense fallback={<SceneProgress />}>
+          <color attach="background" args={['#c0c0c0']} />
+          <SceneAudioListener />
+          <SceneEffects />
+          <SceneEnvironment />
+          <SceneObjects />
+          <SceneOrbitControls />
+        </Suspense>
+        <RaycastWhenCameraMoves />
+      </Canvas>
+    </div>
+  </Providers>
 );
