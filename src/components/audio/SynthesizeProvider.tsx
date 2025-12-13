@@ -1,10 +1,12 @@
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { usePitchMap } from '@/components/providers/PitchMapProvider';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
 import { useAudioContext } from './AudioContextProvider';
+import { useConnectNodeChain } from './hooks/useConnectNode';
 import { useDynamicsCompressor } from './hooks/useDynamicsCompressor';
 import { useGain } from './hooks/useGain';
+import { createWhiteNoiseBuffer } from './utils/createWhiteNoiseBuffer';
 
 type Position = [number, number, number];
 
@@ -17,17 +19,6 @@ const WHITENOISE_BUFFER_SIZE = 10;
  * Utilities
  * ----
  */
-const createWhiteNoiseBuffer = (ctx: AudioContext, length = 2): AudioBuffer => {
-  const bufferSize = Math.ceil(ctx.sampleRate * length);
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    data[i] = Math.random() * 2 - 1;
-  }
-
-  return buffer;
-};
-
 const shouldPlay = (activeVoices: number, effectiveGain: number) => {
   if (activeVoices >= MAX_VOICES) {
     return false;
@@ -71,6 +62,24 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
 
   const ctx = useAudioContext();
   const masterCompressor = useDynamicsCompressor({ threshold: -10, ratio: 12 }, ctx?.destination);
+  const effectChainInput = useGain({ gain: 1 }, null);
+  const [effects, setEffects] = useState<[AudioNode, AudioNode][]>([]);
+  useConnectNodeChain(effectChainInput, effects, masterCompressor);
+
+  const addEffect = useCallback((newEffectIn: AudioNode | null, newEffectOut = newEffectIn) => {
+    if (newEffectIn === null || newEffectOut === null) {
+      return () => {};
+    }
+
+    setEffects(effects => [...effects, [newEffectIn, newEffectOut]]);
+    return () =>
+      setEffects(effects =>
+        effects.filter(
+          ([effectIn, effectOut]) => effectIn === newEffectIn && effectOut === newEffectOut
+        )
+      );
+  }, []);
+
   const destinationOut = useGain({ gain: 1 }, masterCompressor);
   const analyzerOut = useGain({ gain: 1 }, null);
   const whiteNoise = useMemo(
@@ -234,5 +243,6 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     synthesizeSine,
     synthesizeNoise,
     playAudio,
+    addEffect,
   };
 });

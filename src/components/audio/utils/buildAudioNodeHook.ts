@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLatestRef } from '@/hooks/useLatestRef';
 import { useAudioContext } from '../AudioContextProvider';
+import { useConnectNode } from '../hooks/useConnectNode';
 
 export const buildAudioNodeHook = <TNode extends AudioNode, TProps, TState>(
   onCreate: (ctx: AudioContext) => TNode | { node: TNode; state: TState },
@@ -7,6 +9,7 @@ export const buildAudioNodeHook = <TNode extends AudioNode, TProps, TState>(
 ) => {
   const useAudioNode = (props: TProps, next: AudioNode | null | undefined) => {
     const [node, setNode] = useState<TNode | null>(null);
+    const latestPropRef = useLatestRef(props);
     const stateRef = useRef<TState | null>(null);
     const ctx = useAudioContext();
 
@@ -23,18 +26,11 @@ export const buildAudioNodeHook = <TNode extends AudioNode, TProps, TState>(
 
     useEffect(() => {
       if (node) {
-        onUpdate(node, props, stateRef.current!);
+        onUpdate(node, latestPropRef.current, stateRef.current!);
       }
-    }, [node]);
+    }, [node, latestPropRef]);
 
-    useEffect(() => {
-      if (!node || !next) {
-        return () => {};
-      }
-
-      node.connect(next);
-      return () => node.disconnect(next);
-    }, [next, node]);
+    useConnectNode(node, next ?? null);
 
     return node;
   };

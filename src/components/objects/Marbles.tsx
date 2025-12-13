@@ -147,7 +147,7 @@ export const Marbles = ({
         return;
       }
 
-      if (lastSpawn < (1.07 - readFlowRate()) * 100) {
+      if (lastSpawn < (1.07 - readFlowRate() ** 0.2) * 100) {
         lastSpawn++;
         return;
       }

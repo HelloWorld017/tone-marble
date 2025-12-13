@@ -76,10 +76,13 @@ const SceneObjects = () => (
 const SceneAudioListener = () => {
   const ctx = useAudioContext();
   const { camera } = useThree();
-  const isMuted = useInterfaceState(state => state.isMuted);
+  let isMuted = useInterfaceState(state => state.isMuted);
+  const isPoweredOn = useInterfaceState(state => state.isPoweredOn);
   const volume = useInterfaceState(state => state.volume);
   const analyzerOut = useSynthesize(state => state.analyzerOut);
   const destinationOut = useSynthesize(state => state.destinationOut);
+
+  isMuted ||= !isPoweredOn;
 
   useEffect(() => {
     if (!ctx) {

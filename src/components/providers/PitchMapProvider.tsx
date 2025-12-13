@@ -10,6 +10,28 @@ const PITCH_COLORS = Array.from({ length: 12 }).map(
   (_, index) => `oklch(0.6096 0.1744 ${360 / index})`
 );
 
+const TIMESTAMP_POOL_SIZE = 64;
+const useEffectiveSpeed = () => {
+  const pointer = useRef(0);
+  const [timestampPool] = useState(() => new Float32Array(TIMESTAMP_POOL_SIZE));
+  const effectiveSpeed = useRef(0);
+
+  const onAdvance = useLatestCallback(() => {
+    const lastTimestamp = timestampPool[pointer.current];
+    const now = performance.now();
+    timestampPool[pointer.current] = now;
+    if (lastTimestamp === 0 && pointer.current > 0) {
+      effectiveSpeed.current = (pointer.current / (now - timestampPool[0])) * 2000;
+    } else {
+      effectiveSpeed.current = (TIMESTAMP_POOL_SIZE / (now - lastTimestamp)) * 2000;
+    }
+
+    pointer.current = (pointer.current + 1) % TIMESTAMP_POOL_SIZE;
+  });
+
+  return { effectiveSpeed, onAdvance };
+};
+
 export const [PitchMapProvider, usePitchMap] = buildContext(() => {
   const isRecording = useInterfaceState(state => state.isRecording);
   const pointer = useRef(0);
@@ -73,13 +95,18 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
     [pitchMap, ctx]
   );
 
+  const { effectiveSpeed, onAdvance: onUpdateSpeed } = useEffectiveSpeed();
   const advancePointer = useLatestCallback(() => {
     const nextPointer = (pointer.current + POINTER_ADVANCE) % RECORD_SIZE;
     const prevIntPointer = ~~pointer.current;
-    if (prevIntPointer !== ~~nextPointer && latestPendingPitch.current !== null) {
-      writePitchInternal(latestPendingPitch.current, prevIntPointer);
-      // Just keep write until new pitch arrives
-      // latestPendingPitch.current = null;
+    if (prevIntPointer !== ~~nextPointer) {
+      if (latestPendingPitch.current !== null) {
+        writePitchInternal(latestPendingPitch.current, prevIntPointer);
+        // Just keep write until new pitch arrives
+        // latestPendingPitch.current = null;
+      }
+
+      onUpdateSpeed();
     }
 
     pointer.current = nextPointer;
@@ -92,13 +119,17 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
   }, [isRecording]);
 
   return {
+    // Playback
     pointer,
+    effectiveSpeed,
+    advancePointer,
+    getPointerAngle,
+
+    // Pitch
     pitchMap,
     pitchTexture,
     subscribePitchTexture,
     updatePitch,
     readPitch,
-    advancePointer,
-    getPointerAngle,
   };
 });

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLatestRef } from '@/hooks/useLatestRef';
 import { createNeuralPitchDetector } from '@/utils/pitchDetector';
 import { useAudioContext } from '../AudioContextProvider';
+import { useConnectNode } from './useConnectNode';
 import type { PitchResult } from '@/utils/pitchDetector';
 
 export const usePitchDetector = (
@@ -28,18 +29,5 @@ export const usePitchDetector = (
     };
   }, [ctx, onPitchDetection]);
 
-  useEffect(() => {
-    if (!pitchDetector) {
-      return () => {};
-    }
-
-    from?.connect(pitchDetector);
-    return () => {
-      try {
-        from?.disconnect(pitchDetector);
-      } catch {
-        /* when the input is gone */
-      }
-    };
-  }, [from, pitchDetector]);
+  useConnectNode(from, pitchDetector);
 };

@@ -6,6 +6,7 @@ import {
 } from './components/audio/AudioContextProvider';
 import { PitchDetector } from './components/audio/PitchDetector';
 import { SynthesizeProvider } from './components/audio/SynthesizeProvider';
+import { SynthesizeRhythm } from './components/audio/SynthesizeRhythm';
 import { ControllerProvider } from './components/providers/ControllerProvider';
 import { InterfaceStateProvider } from './components/providers/InterfaceStateProvider';
 import { PitchMapProvider } from './components/providers/PitchMapProvider';
@@ -23,7 +24,10 @@ const AppProviders = ({ children }: { children: ReactNode }) => (
         <InterfaceStateProvider>
           <PitchMapProvider>
             <PitchDetector />
-            <SynthesizeProvider>{children}</SynthesizeProvider>
+            <SynthesizeProvider>
+              <SynthesizeRhythm />
+              {children}
+            </SynthesizeProvider>
           </PitchMapProvider>
         </InterfaceStateProvider>
       </ControllerProvider>
