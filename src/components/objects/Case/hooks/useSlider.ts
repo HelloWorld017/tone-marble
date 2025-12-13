@@ -1,7 +1,6 @@
 import { useSpring } from '@react-spring/three';
 import { throttle } from 'es-toolkit';
-import { useId, useMemo, useRef, useState } from 'react';
-import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
+import { useMemo, useRef, useState } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { useHover } from './useHover';
 import type { ThreeEvent } from '@react-three/fiber';

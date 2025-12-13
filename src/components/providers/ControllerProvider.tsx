@@ -4,6 +4,7 @@ import { PEER_ID_PREFIX } from '@/constants';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
 import { calculateFlowRate } from '@/utils/flowRate';
+import type { Position } from '@/types/Position';
 import type { DataConnection } from 'peerjs';
 
 export type Device = {
@@ -15,7 +16,7 @@ const MAX_TIMEOUT = 5000;
 
 export const [ControllerProvider, useController] = buildContext(() => {
   const flowRateRef = useRef<number>(0);
-  const orientationRef = useRef<[number, number, number]>([0, 0, 0]);
+  const orientationRef = useRef<Position>([0, 0, 0]);
   const readFlowRate = useCallback(() => flowRateRef.current, []);
   const updateFlowRate = useCallback((nextFlowRate: number) => {
     flowRateRef.current = nextFlowRate;

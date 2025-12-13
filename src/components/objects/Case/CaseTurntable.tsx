@@ -43,30 +43,23 @@ export const CaseTurntable = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | '
       <a.primitive object={nodes.DiscDiscBone} />
       <primitive object={nodes.neutral_bone_6} />
       <skinnedMesh
-        frustumCulled={false}
         geometry={nodes.DiscMesh_1.geometry}
         material={materials.Base}
         skeleton={nodes.DiscMesh_1.skeleton}
       />
       <group {...button.groupProps}>
         <skinnedMesh
-          frustumCulled={false}
           geometry={nodes.DiscMesh_2.geometry}
           material={materials.Button}
           skeleton={nodes.DiscMesh_2.skeleton}
         />
         <skinnedMesh
-          frustumCulled={false}
           geometry={nodes.DiscMesh_3.geometry}
           material={materials['Button.Image']}
           skeleton={nodes.DiscMesh_3.skeleton}
         />
       </group>
-      <skinnedMesh
-        frustumCulled={false}
-        geometry={nodes.DiscMesh_4.geometry}
-        skeleton={nodes.DiscMesh_4.skeleton}
-      >
+      <skinnedMesh geometry={nodes.DiscMesh_4.geometry} skeleton={nodes.DiscMesh_4.skeleton}>
         <meshStandardMaterial
           {...materials['Turntable.Simple']}
           emissive="white"
@@ -78,7 +71,6 @@ export const CaseTurntable = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | '
         </meshStandardMaterial>
       </skinnedMesh>
       <skinnedMesh
-        frustumCulled={false}
         geometry={nodes.DiscMesh_5.geometry}
         material={materials['Turntable.Simple']}
         skeleton={nodes.DiscMesh_5.skeleton}

@@ -1,5 +1,6 @@
 import { animated, useSpringValue } from '@react-spring/three';
 import { useEffect, useRef, useState } from 'react';
+import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { usePitchMap } from '@/components/providers/PitchMapProvider';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { useHover } from './hooks/useHover';
@@ -10,6 +11,7 @@ const a = animated as unknown as AnimatedSimple;
 
 export const CaseMIDI = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'materials'>) => {
   const [midiAccess, setMIDIAccess] = useState<MIDIAccess | null>(null);
+  const isPoweredOn = useInterfaceState(state => state.isPoweredOn);
   const { groupProps } = useHover({
     onPointerUpActive: () => {
       if (navigator.requestMIDIAccess) {
@@ -23,8 +25,8 @@ export const CaseMIDI = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mater
 
   const light = useSpringValue('#000000');
   useEffect(() => {
-    void light.start(midiAccess ? '#001eff' : '#000000');
-  }, [midiAccess]);
+    void light.start(isPoweredOn && midiAccess ? '#001eff' : '#000000');
+  }, [isPoweredOn, midiAccess]);
 
   const lastInput = useRef<number | null>(null);
   const updateChroma = usePitchMap(state => state.updateChroma);
@@ -95,7 +97,7 @@ export const CaseMIDI = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mater
           <a.meshStandardMaterial
             {...materials['Connector.WallInner']}
             emissive={light}
-            emissiveIntensity={1}
+            emissiveIntensity={10}
           />
         </mesh>
         <mesh

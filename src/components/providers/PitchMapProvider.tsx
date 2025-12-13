@@ -29,7 +29,13 @@ const useEffectiveSpeed = () => {
     pointer.current = (pointer.current + 1) % TIMESTAMP_POOL_SIZE;
   });
 
-  return { effectiveSpeed, onAdvance };
+  const onResetSpeed = useLatestCallback(() => {
+    effectiveSpeed.current = 0;
+    pointer.current = 0;
+    timestampPool.fill(0);
+  });
+
+  return { effectiveSpeed, onAdvance, onResetSpeed };
 };
 
 export const [PitchMapProvider, usePitchMap] = buildContext(() => {
@@ -96,7 +102,7 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
     [chromaMap, ctx]
   );
 
-  const { effectiveSpeed, onAdvance: onUpdateSpeed } = useEffectiveSpeed();
+  const { effectiveSpeed, onAdvance: onUpdateSpeed, onResetSpeed } = useEffectiveSpeed();
   const advancePointer = useLatestCallback(() => {
     const nextPointer = (pointer.current + POINTER_ADVANCE) % RECORD_SIZE;
     const prevIntPointer = ~~pointer.current;
@@ -118,6 +124,17 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
       latestPendingChroma.current = null;
     }
   }, [isRecording]);
+
+  const isPoweredOn = useInterfaceState(state => state.isPoweredOn);
+  useEffect(() => {
+    if (!isPoweredOn) {
+      latestPendingChroma.current = null;
+      ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      chromaMap.fill(0);
+      subscriptions.forEach(subscription => subscription());
+      onResetSpeed();
+    }
+  }, [ctx, isPoweredOn, chromaMap, onResetSpeed]);
 
   return {
     // Playback

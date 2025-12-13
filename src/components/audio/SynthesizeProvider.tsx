@@ -1,64 +1,15 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { usePitchMap } from '@/components/providers/PitchMapProvider';
+import { useCallback, useRef, useState } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
 import { useAudioContext } from './AudioContextProvider';
 import { useConnectNodeChain } from './hooks/useConnectNode';
 import { useDynamicsCompressor } from './hooks/useDynamicsCompressor';
 import { useGain } from './hooks/useGain';
-import { createWhiteNoiseBuffer } from './utils/createWhiteNoiseBuffer';
 import { updatePannerForPosition } from './utils/updatePannerForPosition';
+import type { Position } from '@/types/Position';
 
-type Position = [number, number, number];
-
-const MAX_VOICES = 100;
-const HARMONIC_RATIOS = [0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0];
-const WHITENOISE_BUFFER_SIZE = 10;
-
-/*
- * Utilities
- * ----
- */
-const shouldPlay = (activeVoices: number, effectiveGain: number) => {
-  if (activeVoices >= MAX_VOICES) {
-    return false;
-  }
-
-  if (activeVoices > 80) {
-    return effectiveGain >= 0.15;
-  }
-
-  if (activeVoices >= 50) {
-    return effectiveGain >= 0.05;
-  }
-
-  return effectiveGain >= 0.001;
-};
-
-const getEffectiveGain = (gain: number, origin: Position, listener: Position) => {
-  const distance = Math.hypot(
-    origin[0] - listener[0],
-    origin[1] - listener[1],
-    origin[2] - listener[2]
-  );
-  const attenuation = 1 / (1 + distance);
-  return gain * attenuation;
-};
-
-const getRandomFrequency = (baseFrequency: number) => {
-  const ratio = HARMONIC_RATIOS[~~(Math.random() * HARMONIC_RATIOS.length)];
-  const detune = 1 + (Math.random() * 0.01 - 0.005);
-  return baseFrequency * ratio * detune;
-};
-
-/*
- * Provider
- * ----
- */
 export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
-  const activeVoices = useRef(0);
   const listenerPosition = useRef<Position>([0, 0, 0]);
-  const readPitch = usePitchMap(state => state.readPitch);
 
   const ctx = useAudioContext();
   const masterCompressor = useDynamicsCompressor({ threshold: -10, ratio: 12 }, ctx?.destination);
@@ -82,10 +33,6 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
 
   const destinationOut = useGain({ gain: 1 }, masterCompressor);
   const analyzerOut = useGain({ gain: 1 }, null);
-  const whiteNoise = useMemo(
-    () => ctx && createWhiteNoiseBuffer(ctx, WHITENOISE_BUFFER_SIZE),
-    [ctx]
-  );
 
   const updateListenerPosition = useLatestCallback((position: Position) => {
     if (!ctx) {
@@ -96,103 +43,6 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     ctx.listener.positionX.value = position[0];
     ctx.listener.positionY.value = position[1];
     ctx.listener.positionZ.value = position[2];
-  });
-
-  /* Sine-based Synthesizer */
-  const synthesizeSine = useLatestCallback((position: Position, gain: number) => {
-    if (!ctx || !destinationOut || !analyzerOut) {
-      return;
-    }
-
-    const effectiveGain = getEffectiveGain(gain, position, listenerPosition.current);
-    if (!shouldPlay(activeVoices.current, effectiveGain)) {
-      return;
-    }
-
-    const t = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const envelope = ctx.createGain();
-    const panner = ctx.createPanner();
-
-    const frequency = getRandomFrequency(readPitch());
-    osc.type = 'sine';
-    osc.frequency.value = frequency;
-
-    const attack = 0.01;
-    const decay = 0.1 + gain * 0.2;
-    envelope.gain.setValueAtTime(0, t);
-    envelope.gain.linearRampToValueAtTime(Math.min(1, gain * 3), t + attack);
-    envelope.gain.exponentialRampToValueAtTime(0.001, t + attack + decay);
-
-    updatePannerForPosition(panner, position);
-
-    osc.connect(envelope);
-    envelope.connect(panner);
-    envelope.connect(analyzerOut);
-    panner.connect(destinationOut);
-    activeVoices.current++;
-
-    osc.start(t);
-    osc.stop(t + attack + decay + 0.1);
-    osc.onended = () => {
-      osc.disconnect();
-      envelope.disconnect();
-      panner.disconnect();
-      activeVoices.current--;
-    };
-  });
-
-  /* Noise-based Synthesizer */
-  const synthesizeNoise = useLatestCallback((position: Position, gain: number) => {
-    if (!ctx || !destinationOut || !analyzerOut) {
-      return;
-    }
-
-    const effectiveGain = getEffectiveGain(gain, position, listenerPosition.current);
-    if (!shouldPlay(activeVoices.current, effectiveGain)) {
-      return;
-    }
-
-    const t = ctx.currentTime;
-    const source = ctx.createBufferSource();
-    const filter = ctx.createBiquadFilter();
-    const envelope = ctx.createGain();
-    const panner = ctx.createPanner();
-
-    source.buffer = whiteNoise;
-    source.loop = true;
-    source.loopStart = Math.random() * (WHITENOISE_BUFFER_SIZE - 0.5);
-    source.loopEnd = source.loopStart + 0.5;
-
-    const frequency = getRandomFrequency(readPitch());
-    filter.type = 'bandpass';
-    filter.frequency.value = frequency;
-    filter.Q.value = 0.5 + Math.random() * 0.5;
-
-    const attack = 0.05 + Math.random() * 0.05;
-    const decay = 0.2 + gain * 0.5;
-    envelope.gain.setValueAtTime(0, t);
-    envelope.gain.linearRampToValueAtTime(gain * 0.15, t + attack);
-    envelope.gain.linearRampToValueAtTime(0, t + attack + decay);
-
-    updatePannerForPosition(panner, position);
-
-    source.connect(filter);
-    filter.connect(envelope);
-    envelope.connect(panner);
-    envelope.connect(analyzerOut);
-    panner.connect(destinationOut);
-    activeVoices.current++;
-
-    source.start(t);
-    source.stop(t + attack + decay + 0.1);
-    source.onended = () => {
-      source.disconnect();
-      filter.disconnect();
-      envelope.disconnect();
-      panner.disconnect();
-      activeVoices.current--;
-    };
   });
 
   const playAudio = useLatestCallback((audio: AudioBuffer, position?: Position) => {
@@ -223,12 +73,22 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     };
   });
 
+  const calculateEffectiveGain = useLatestCallback((gain: number, origin: Position) => {
+    const listener = listenerPosition.current;
+    const distance = Math.hypot(
+      origin[0] - listener[0],
+      origin[1] - listener[1],
+      origin[2] - listener[2]
+    );
+    const attenuation = 1 / (1 + distance);
+    return gain * attenuation;
+  });
+
   return {
     analyzerOut,
     destinationOut,
     updateListenerPosition,
-    synthesizeSine,
-    synthesizeNoise,
+    calculateEffectiveGain,
     playAudio,
     addEffect,
   };

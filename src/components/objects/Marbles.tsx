@@ -5,6 +5,7 @@ import { Matrix4, Vector3 } from 'three';
 import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { useController } from '../providers/ControllerProvider';
+import type { Position } from '@/types/Position';
 import type { Ref } from 'react';
 import type { InstancedMesh } from 'three';
 
@@ -21,7 +22,7 @@ export type MarblesProps = {
   spawnHeight?: number;
   spawnX?: number;
   spawnY?: number;
-  resetBound?: [[number, number, number], [number, number, number]];
+  resetBound?: [Position, Position];
   resetX?: number;
   resetY?: number;
   automatic?: boolean;

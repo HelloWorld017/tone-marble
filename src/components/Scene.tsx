@@ -5,6 +5,7 @@ import {
   Html,
   OrbitControls,
   PerspectiveCamera,
+  Preload,
   useProgress,
 } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -141,23 +142,6 @@ const SceneProgress = () => {
   return <Html center>{progress.toFixed(2)} % loaded</Html>;
 };
 
-const RaycastWhenCameraMoves = () => {
-  const matrix = new Matrix4();
-  const lastCameraUpdate = useRef(0);
-  useFrame(state => {
-    if (
-      lastCameraUpdate.current < performance.now() - 100 &&
-      !matrix.equals(state.camera.matrixWorld)
-    ) {
-      state.events.update?.();
-      matrix.copy(state.camera.matrixWorld);
-      lastCameraUpdate.current = performance.now();
-    }
-  });
-
-  return <></>;
-};
-
 export const Scene = () => (
   <div style={{ width: '100vw', height: '100vh' }}>
     <Canvas shadows flat>
@@ -169,8 +153,8 @@ export const Scene = () => (
         <SceneEnvironment />
         <SceneObjects />
         <SceneOrbitControls />
+        <Preload all />
       </Suspense>
-      <RaycastWhenCameraMoves />
     </Canvas>
   </div>
 );

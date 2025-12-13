@@ -5,6 +5,7 @@ import {
   AudioContextProvider,
 } from './components/audio/AudioContextProvider';
 import { ChromaDetector } from './components/audio/ChromaDetector';
+import { SynthesizeMarbleProvider } from './components/audio/SynthesizeMarbleProvider';
 import { SynthesizeProvider } from './components/audio/SynthesizeProvider';
 import { SynthesizeRhythm } from './components/audio/SynthesizeRhythm';
 import { ControllerProvider } from './components/providers/ControllerProvider';
@@ -25,8 +26,10 @@ const AppProviders = ({ children }: { children: ReactNode }) => (
           <PitchMapProvider>
             <ChromaDetector />
             <SynthesizeProvider>
-              <SynthesizeRhythm />
-              {children}
+              <SynthesizeMarbleProvider>
+                <SynthesizeRhythm />
+                {children}
+              </SynthesizeMarbleProvider>
             </SynthesizeProvider>
           </PitchMapProvider>
         </InterfaceStateProvider>

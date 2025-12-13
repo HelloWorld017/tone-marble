@@ -31,20 +31,17 @@ export const CaseButtons = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'ma
         <a.primitive object={nodes.LargeButtonGlassBone} position-z={glassButton.boneZ} />
         <primitive object={nodes.neutral_bone} />
         <skinnedMesh
-          frustumCulled={false}
           geometry={nodes.LargeButtonGlassMesh_1.geometry}
           material={materials.Base}
           skeleton={nodes.LargeButtonGlassMesh_1.skeleton}
         />
         <group {...glassButton.groupProps}>
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.LargeButtonGlassMesh_2.geometry}
             material={materials.Button}
             skeleton={nodes.LargeButtonGlassMesh_2.skeleton}
           />
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.LargeButtonGlassMesh_3.geometry}
             skeleton={nodes.LargeButtonGlassMesh_3.skeleton}
           >
@@ -54,7 +51,6 @@ export const CaseButtons = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'ma
             />
           </skinnedMesh>
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.LargeButtonGlassMesh_4.geometry}
             material={materials['Button.Image']}
             skeleton={nodes.LargeButtonGlassMesh_4.skeleton}
@@ -65,7 +61,6 @@ export const CaseButtons = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'ma
         <a.primitive object={nodes.LargeButtonSandBone} position-z={sandButton.boneZ} />
         <primitive object={nodes.neutral_bone_1} />
         <skinnedMesh
-          frustumCulled={false}
           geometry={nodes.LargeButtonSandMesh_1.geometry}
           material={materials.Base}
           skeleton={nodes.LargeButtonSandMesh_1.skeleton}
@@ -73,13 +68,11 @@ export const CaseButtons = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'ma
 
         <group {...sandButton.groupProps}>
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.LargeButtonSandMesh_2.geometry}
             material={materials.Button}
             skeleton={nodes.LargeButtonSandMesh_2.skeleton}
           />
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.LargeButtonSandMesh_3.geometry}
             skeleton={nodes.LargeButtonSandMesh_3.skeleton}
           >
@@ -89,7 +82,6 @@ export const CaseButtons = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'ma
             />
           </skinnedMesh>
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.LargeButtonSandMesh_4.geometry}
             material={materials['Button.Image']}
             skeleton={nodes.LargeButtonSandMesh_4.skeleton}
@@ -100,20 +92,17 @@ export const CaseButtons = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'ma
         <a.primitive object={nodes.LargeButtonMetalBone} position-z={metalButton.boneZ} />
         <primitive object={nodes.neutral_bone_2} />
         <skinnedMesh
-          frustumCulled={false}
           geometry={nodes.LargeButtonMetalMesh_1.geometry}
           material={materials.Base}
           skeleton={nodes.LargeButtonMetalMesh_1.skeleton}
         />
         <group {...metalButton.groupProps}>
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.LargeButtonMetalMesh_2.geometry}
             material={materials.Button}
             skeleton={nodes.LargeButtonMetalMesh_2.skeleton}
           />
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.LargeButtonMetalMesh_3.geometry}
             skeleton={nodes.LargeButtonMetalMesh_3.skeleton}
           >
@@ -123,7 +112,6 @@ export const CaseButtons = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'ma
             />
           </skinnedMesh>
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.LargeButtonMetalMesh_4.geometry}
             material={materials['Button.Image']}
             skeleton={nodes.LargeButtonMetalMesh_4.skeleton}

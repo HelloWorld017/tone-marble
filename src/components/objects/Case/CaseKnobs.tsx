@@ -24,26 +24,22 @@ export const CaseKnobs = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
         <a.primitive object={nodes.KnobWaveBone} rotation-y={knobRhythm.boneRotate} />
         <primitive object={nodes.neutral_bone_5} />
         <skinnedMesh
-          frustumCulled={false}
           geometry={nodes.KnobWaveMesh_1.geometry}
           material={materials.Base}
           skeleton={nodes.KnobWaveMesh_1.skeleton}
         />
         <skinnedMesh
-          frustumCulled={false}
           geometry={nodes.KnobWaveMesh_2.geometry}
           material={materials['Knob']}
           skeleton={nodes.KnobWaveMesh_2.skeleton}
         />
         <group {...knobRhythm.groupProps}>
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.KnobWaveMesh_3.geometry}
             material={materials['Knob.Face']}
             skeleton={nodes.KnobWaveMesh_3.skeleton}
           />
           <skinnedMesh
-            frustumCulled={false}
             geometry={nodes.KnobWaveMesh_4.geometry}
             skeleton={nodes.KnobWaveMesh_4.skeleton}
           >
@@ -61,13 +57,11 @@ export const CaseKnobs = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
         <a.primitive object={nodes.KnobSelectBone} rotation-y={knobRadius.boneRotate} />
         <primitive object={nodes.neutral_bone_9} />
         <skinnedMesh
-          frustumCulled={false}
           geometry={nodes.KnobSelectMesh_1.geometry}
           material={materials.Base}
           skeleton={nodes.KnobSelectMesh_1.skeleton}
         />
         <skinnedMesh
-          frustumCulled={false}
           geometry={nodes.KnobSelectMesh_2.geometry}
           skeleton={nodes.KnobSelectMesh_2.skeleton}
           {...knobRadius.groupProps}

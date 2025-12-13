@@ -1,9 +1,10 @@
 import { Instance, Instances } from '@react-three/drei';
 import { CapsuleCollider, RigidBody } from '@react-three/rapier';
 import { useMemo } from 'react';
-import { useSynthesize } from '@/components/audio/SynthesizeProvider';
 import { usePitchMap } from '@/components/providers/PitchMapProvider';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
+import { useSynthesizeMarble } from '../audio/SynthesizeMarbleProvider';
+import type { Position } from '@/types/Position';
 import type { ContactForceHandler } from '@react-three/rapier';
 
 const MAX_COLLISION_FORCE = 20;
@@ -47,8 +48,9 @@ export const Pillars = ({
     return instances;
   }, [planeAngle, rows, rowGap, columns, columnGap]);
 
-  const synthesizeSine = useSynthesize(state => state.synthesizeSine);
-  const synthesizeNoise = useSynthesize(state => state.synthesizeNoise);
+  const synthesizeSand = useSynthesizeMarble(state => state.synthesizeSand);
+  const synthesizeGlass = useSynthesizeMarble(state => state.synthesizeGlass);
+  const synthesizeWind = useSynthesizeMarble(state => state.synthesizeWind);
   const advancePointer = usePitchMap(state => state.advancePointer);
   const onCollide = useLatestCallback<ContactForceHandler>(event => {
     if (event.maxForceMagnitude < 1) {
@@ -60,12 +62,20 @@ export const Pillars = ({
       return;
     }
 
-    (Math.random() < 0.5 ? synthesizeSine : synthesizeNoise)(
-      [position.x, position.y, position.z],
-      Math.max(0, Math.min(1, event.maxForceMagnitude / MAX_COLLISION_FORCE))
-    );
-
     advancePointer();
+
+    const positionTuple = [position.x, position.y, position.z] as Position;
+    const gain = Math.max(0, Math.min(1, event.maxForceMagnitude / MAX_COLLISION_FORCE));
+
+    if (Math.random() < 0.1) {
+      return synthesizeWind(positionTuple, gain);
+    }
+
+    if (Math.random() < 0.5) {
+      return synthesizeSand(positionTuple, gain);
+    }
+
+    synthesizeGlass(positionTuple, gain);
   });
 
   return (
