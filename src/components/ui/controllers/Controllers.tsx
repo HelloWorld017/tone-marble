@@ -78,7 +78,7 @@ const DeviceConnected = () => {
 const NoDeviceConnected = () => {
   const deviceId = useController(state => state.selfId);
   const [url, setURL] = useState<string | null>();
-  useLayoutEffect(() => setURL(new URL(`/connect/?${deviceId}`, location.href).href), [deviceId]);
+  useLayoutEffect(() => setURL(new URL(`./connect/?${deviceId}`, location.href).href), [deviceId]);
 
   return (
     <div>
