@@ -43,6 +43,14 @@ export const contentStyle = (theme: Theme) => css`
     background: #808080;
     color: #ffffff;
 
+    &.secondary {
+      margin-top: 2rem;
+      background: transparent;
+      border: 4px solid #808080;
+      color: #808080;
+      font-weight: 600;
+    }
+
     &::after {
       display: inline-block;
       content: '→';
