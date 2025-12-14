@@ -38,6 +38,7 @@ export const contentsStyle = (theme: Theme) => css`
   top: 1.6rem;
   left: 7.6rem;
   width: 30rem;
+  max-width: calc(100vw - 9.6rem);
 
   background: ${theme.colors.bgBase};
   border-radius: 0.8rem;

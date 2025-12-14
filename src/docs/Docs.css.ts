@@ -23,11 +23,11 @@ export const contentStyle = (theme: Theme) => css`
     max-width: 900px;
     margin: 0 auto;
     padding: 0 32px;
-    padding-top: 200px;
+    padding-top: 150px;
 
     @media (max-width: 768px) {
       padding: 0 16px;
-      padding-top: 200px;
+      padding-top: 150px;
     }
   }
 
@@ -68,8 +68,9 @@ export const contentStyle = (theme: Theme) => css`
 
     & > span {
       display: block;
+      margin-top: 1rem;
       font-size: 5rem;
-      line-height: 7rem;
+      line-height: 6rem;
       font-weight: 400;
       color: ${theme.colors.fillSecondary};
     }
@@ -78,7 +79,7 @@ export const contentStyle = (theme: Theme) => css`
   h2 {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 5rem;
-    line-height: 7rem;
+    line-height: 6rem;
     font-weight: 600;
     color: ${theme.colors.fillPrimary};
 
@@ -92,8 +93,9 @@ export const contentStyle = (theme: Theme) => css`
 
     & > span {
       display: block;
+      margin-top: 1rem;
       font-size: 3rem;
-      line-height: 4rem;
+      line-height: 3.4rem;
       font-weight: 400;
       color: ${theme.colors.fillSecondary};
     }
