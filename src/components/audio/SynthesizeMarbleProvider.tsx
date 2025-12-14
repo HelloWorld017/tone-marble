@@ -1,10 +1,10 @@
 import { useMemo, useRef } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
+import { useInterfaceState } from '../providers/InterfaceStateProvider';
 import { usePitchMap } from '../providers/PitchMapProvider';
 import { useAudioContext } from './AudioContextProvider';
 import { useSynthesize } from './SynthesizeProvider';
-import { createPinkNoiseBuffer } from './utils/createPinkNoiseBuffer';
 import { createWhiteNoiseBuffer } from './utils/createWhiteNoiseBuffer';
 import { updatePannerForPosition } from './utils/updatePannerForPosition';
 import type { Position } from '@/types/Position';
@@ -12,7 +12,6 @@ import type { Position } from '@/types/Position';
 const MAX_VOICES = 100;
 const HARMONIC_RATIOS = [0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0];
 const WHITENOISE_BUFFER_SIZE = 10;
-const PINKNOISE_BUFFER_SIZE = 10;
 
 /*
  * Utilities
@@ -53,7 +52,6 @@ export const [SynthesizeMarbleProvider, useSynthesizeMarble] = buildContext(() =
   const activeVoices = useRef(0);
   const readPitch = usePitchMap(state => state.readPitch);
 
-  const pinkNoise = useMemo(() => ctx && createPinkNoiseBuffer(ctx, PINKNOISE_BUFFER_SIZE), [ctx]);
   const whiteNoise = useMemo(
     () => ctx && createWhiteNoiseBuffer(ctx, WHITENOISE_BUFFER_SIZE),
     [ctx]
@@ -172,7 +170,7 @@ export const [SynthesizeMarbleProvider, useSynthesizeMarble] = buildContext(() =
 
     source.buffer = whiteNoise;
     source.loop = true;
-    source.loopStart = Math.random() * (PINKNOISE_BUFFER_SIZE - 2);
+    source.loopStart = Math.random() * (WHITENOISE_BUFFER_SIZE - 2);
     source.loopEnd = source.loopStart + 2;
 
     const frequency = getRandomFrequency(readPitch());
@@ -206,9 +204,35 @@ export const [SynthesizeMarbleProvider, useSynthesizeMarble] = buildContext(() =
     };
   });
 
+  const sandActivePillars = useInterfaceState(state => state.sandActivePillars);
+  const glassActivePillars = useInterfaceState(state => state.glassActivePillars);
+  const windActivePillars = useInterfaceState(state => state.windActivePillars);
+  const synthesize = useLatestCallback((row: number, position: Position, gain: number) => {
+    const activeSynthes = [];
+    const mask = 1 << row;
+    if (windActivePillars & mask) {
+      activeSynthes.push(synthesizeWind);
+    }
+
+    if (sandActivePillars & mask) {
+      activeSynthes.push(synthesizeSand, synthesizeSand);
+    }
+
+    if (glassActivePillars & mask) {
+      activeSynthes.push(synthesizeGlass, synthesizeGlass, synthesizeGlass);
+    }
+
+    if (!activeSynthes.length) {
+      return;
+    }
+
+    activeSynthes[~~(Math.random() * activeSynthes.length)](position, gain);
+  });
+
   return {
     synthesizeGlass,
     synthesizeSand,
     synthesizeWind,
+    synthesize,
   };
 });

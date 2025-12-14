@@ -89,6 +89,11 @@ export const SynthesizeRhythm = () => {
 
     osc.start(t);
     osc.stop(t + 0.5);
+    osc.onended = () => {
+      osc.disconnect();
+      gain.disconnect();
+      panner.disconnect();
+    };
   });
 
   const synthesizeHiHat = useLatestCallback(() => {
@@ -122,6 +127,12 @@ export const SynthesizeRhythm = () => {
 
     source.start(t);
     source.stop(t + 0.05);
+    source.onended = () => {
+      source.disconnect();
+      filter.disconnect();
+      gain.disconnect();
+      panner.disconnect();
+    };
   });
 
   const effectiveSpeed = usePitchMap(state => state.effectiveSpeed);

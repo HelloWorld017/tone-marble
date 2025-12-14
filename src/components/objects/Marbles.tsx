@@ -70,10 +70,6 @@ export const Marbles = ({
       throw new Error('Marble does not exist!');
     }
 
-    if (body.isSleeping()) {
-      return;
-    }
-
     body.setTranslation(HOLD_POS, false);
     body.sleep();
     body.setEnabled(false);

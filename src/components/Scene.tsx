@@ -8,7 +8,7 @@ import {
   Preload,
   useProgress,
 } from '@react-three/drei';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import {
   Bloom,
   ChromaticAberration,
@@ -16,15 +16,14 @@ import {
   ToneMapping,
 } from '@react-three/postprocessing';
 import { Physics } from '@react-three/rapier';
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect } from 'react';
 import {
   AudioContext as ThreeAudioContext,
   AudioListener as ThreeAudioListener,
   MeshBasicMaterial,
   Vector2,
-  Matrix4,
 } from 'three';
-import { DEG2RAD } from '@/constants';
+import { DEG2RAD, PILLAR_ROWS } from '@/constants';
 import { useAudioContext } from './audio/AudioContextProvider';
 import { useSynthesize } from './audio/SynthesizeProvider';
 import { useFluorescentBlink } from './hooks/useFluorescentBlink';
@@ -76,7 +75,7 @@ const SceneObjects = () => (
     <Case />
     <Physics gravity={[0, -20, 0]} interpolate={false}>
       <Frame planeWidth={10} planeHeight={32} planeAngle={-5 * DEG2RAD} height={20} />
-      <Pillars planeAngle={-5 * DEG2RAD} rows={18} columns={6} />
+      <Pillars planeAngle={-5 * DEG2RAD} rows={PILLAR_ROWS} columns={6} />
       <Marbles spawnX={-12} spawnY={5} />
     </Physics>
   </>

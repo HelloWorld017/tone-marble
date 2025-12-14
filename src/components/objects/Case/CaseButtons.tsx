@@ -3,26 +3,46 @@ import { useInterfaceState } from '@/components/providers/InterfaceStateProvider
 import { useToggleButton } from './hooks/useToggleButton';
 import type { AnimatedSimple } from '@/types/AnimatedSimple';
 import type { GLTFResult } from '@/types/GLTFResult';
+import type { Object3D } from 'three';
 
 const a = animated as unknown as AnimatedSimple;
 
+type UseSelectionToggleButtonProps = {
+  bone: Object3D;
+  state: number;
+  onChange: (nextState: number) => void;
+};
+
+const useSelectionToggleButton = ({ bone, state, onChange }: UseSelectionToggleButtonProps) => {
+  const mask = useInterfaceState(state => state.selectionMask);
+  const isActive = (state & mask) === mask;
+  const setIsActive = (nextIsActive: boolean) =>
+    onChange(nextIsActive ? state | mask : state & ~mask);
+
+  return useToggleButton({
+    bone,
+    state: isActive,
+    onChange: setIsActive,
+  });
+};
+
 export const CaseButtons = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'materials'>) => {
-  const sandButton = useToggleButton({
+  const sandButton = useSelectionToggleButton({
     bone: nodes.LargeButtonSandBone,
-    state: useInterfaceState(state => state.isSandActive),
-    onChange: useInterfaceState(state => state.setIsSandActive),
+    state: useInterfaceState(state => state.sandActivePillars),
+    onChange: useInterfaceState(state => state.setSandActivePillars),
   });
 
-  const glassButton = useToggleButton({
-    bone: nodes.LargeButtonMetalBone,
-    state: useInterfaceState(state => state.isGlassActive),
-    onChange: useInterfaceState(state => state.setIsGlassActive),
+  const glassButton = useSelectionToggleButton({
+    bone: nodes.LargeButtonGlassBone,
+    state: useInterfaceState(state => state.glassActivePillars),
+    onChange: useInterfaceState(state => state.setGlassActivePillars),
   });
 
-  const metalButton = useToggleButton({
+  const windButton = useSelectionToggleButton({
     bone: nodes.LargeButtonMetalBone,
-    state: useInterfaceState(state => state.isMetalActive),
-    onChange: useInterfaceState(state => state.setIsMetalActive),
+    state: useInterfaceState(state => state.windActivePillars),
+    onChange: useInterfaceState(state => state.setWindActivePillars),
   });
 
   return (
@@ -89,14 +109,14 @@ export const CaseButtons = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'ma
         </group>
       </group>
       <group position={[0, 0.5, -5.8]}>
-        <a.primitive object={nodes.LargeButtonMetalBone} position-z={metalButton.boneZ} />
+        <a.primitive object={nodes.LargeButtonMetalBone} position-z={windButton.boneZ} />
         <primitive object={nodes.neutral_bone_2} />
         <skinnedMesh
           geometry={nodes.LargeButtonMetalMesh_1.geometry}
           material={materials.Base}
           skeleton={nodes.LargeButtonMetalMesh_1.skeleton}
         />
-        <group {...metalButton.groupProps}>
+        <group {...windButton.groupProps}>
           <skinnedMesh
             geometry={nodes.LargeButtonMetalMesh_2.geometry}
             material={materials.Button}
@@ -108,7 +128,7 @@ export const CaseButtons = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'ma
           >
             <a.meshStandardMaterial
               {...materials['Button.Light']}
-              emissiveIntensity={metalButton.lightIntensity}
+              emissiveIntensity={windButton.lightIntensity}
             />
           </skinnedMesh>
           <skinnedMesh

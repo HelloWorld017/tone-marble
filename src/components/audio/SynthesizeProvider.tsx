@@ -87,6 +87,7 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
   return {
     analyzerOut,
     destinationOut,
+    masterCompressor,
     updateListenerPosition,
     calculateEffectiveGain,
     playAudio,

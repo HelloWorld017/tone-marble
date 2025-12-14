@@ -1,5 +1,8 @@
 import { animated } from '@react-spring/three';
+import { debounce } from 'es-toolkit';
+import { useMemo } from 'react';
 import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
+import { PILLAR_SELECTION_ALL, PILLAR_SELECTION_LEVEL } from '@/constants';
 import { useKnob } from './hooks/useKnob';
 import type { AnimatedSimple } from '@/types/AnimatedSimple';
 import type { GLTFResult } from '@/types/GLTFResult';
@@ -8,13 +11,21 @@ const a = animated as unknown as AnimatedSimple;
 
 export const CaseKnobs = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'materials'>) => {
   const knobRhythm = useKnob({
+    bone: nodes.KnobWaveBone,
     state: useInterfaceState(state => state.rhythm),
     onChange: useInterfaceState(state => state.setRhythm),
   });
 
-  const knobRadius = useKnob({
-    state: useInterfaceState(state => state.radius),
-    onChange: useInterfaceState(state => state.setRadius),
+  const selection = useInterfaceState(state => state.selection);
+  const setSelection = useInterfaceState(state => state.setSelection);
+  const setSelectionDebounced = useMemo(() => debounce(setSelection, 7000), [setSelection]);
+  const knobSelection = useKnob({
+    bone: nodes.KnobSelectBone,
+    state: selection / (PILLAR_SELECTION_LEVEL + 1),
+    onChange: value => {
+      setSelection(Math.floor(value * (PILLAR_SELECTION_LEVEL + 1)) % (PILLAR_SELECTION_LEVEL + 1));
+      setSelectionDebounced(PILLAR_SELECTION_ALL);
+    },
     infinite: true,
   });
 
@@ -54,7 +65,7 @@ export const CaseKnobs = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
         </group>
       </group>
       <group position={[0, 0.5, -5.8]}>
-        <a.primitive object={nodes.KnobSelectBone} rotation-y={knobRadius.boneRotate} />
+        <a.primitive object={nodes.KnobSelectBone} rotation-y={knobSelection.boneRotate} />
         <primitive object={nodes.neutral_bone_9} />
         <skinnedMesh
           geometry={nodes.KnobSelectMesh_1.geometry}
@@ -64,7 +75,7 @@ export const CaseKnobs = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
         <skinnedMesh
           geometry={nodes.KnobSelectMesh_2.geometry}
           skeleton={nodes.KnobSelectMesh_2.skeleton}
-          {...knobRadius.groupProps}
+          {...knobSelection.groupProps}
         >
           <meshStandardMaterial
             {...materials['Knob']}

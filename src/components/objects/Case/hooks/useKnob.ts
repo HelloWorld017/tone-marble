@@ -1,18 +1,23 @@
 import { useSpring } from '@react-spring/three';
+import { useThree } from '@react-three/fiber';
 import { throttle } from 'es-toolkit';
 import { useMemo, useRef } from 'react';
+import { Vector3 } from 'three';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { useHover } from './useHover';
+import type { Object3D } from 'three';
 
-const MAX_BLEND_DISTANCE = 5;
+const MAX_BLEND_DISTANCE = 15;
+const MAX_BLEND_DISTANCE_INFINITE = 50;
 
 type UseKnobProps = {
+  bone: Object3D;
   state: number;
   onChange: (nextState: number) => void;
   infinite?: boolean;
 };
 
-export const useKnob = ({ state, onChange, infinite = false }: UseKnobProps) => {
+export const useKnob = ({ bone, state, onChange, infinite = false }: UseKnobProps) => {
   const onChangeLatest = useLatestCallback(onChange);
   const onChangeThrottled = useMemo(() => throttle(onChangeLatest, 150), [onChange]);
   const { boneRotate } = useSpring({
@@ -20,10 +25,14 @@ export const useKnob = ({ state, onChange, infinite = false }: UseKnobProps) => 
   });
 
   const initialState = useRef({ x: 0, y: 0, rotate: boneRotate.get() });
+  const { camera, size } = useThree();
   const { isActive, groupProps } = useHover({
     interfaceKind: 'xy',
-    onPointerDown: event => {
-      initialState.current = { x: event.clientX, y: event.clientY, rotate: boneRotate.get() };
+    onPointerDown: () => {
+      const center = bone.getWorldPosition(new Vector3()).project(camera);
+      const centerX = (center.x * 0.5 + 0.5) * size.width;
+      const centerY = (-center.y * 0.5 + 0.5) * size.height;
+      initialState.current = { x: centerX, y: centerY, rotate: boneRotate.get() };
     },
   });
 
@@ -42,12 +51,21 @@ export const useKnob = ({ state, onChange, infinite = false }: UseKnobProps) => 
     const magnitude = Math.hypot(deltaX, deltaY);
 
     const rotation = infinite
-      ? (1 / 4) * Math.PI - angle
+      ? (-(7 / 4) * Math.PI - angle) % (2 * Math.PI)
       : (1 / 4) * Math.PI - Math.max((1 / 4) * Math.PI, Math.min(angle, (7 / 4) * Math.PI));
 
-    const blendRate = Math.min(magnitude / MAX_BLEND_DISTANCE, 1);
+    const maxBlendDistance = infinite ? MAX_BLEND_DISTANCE_INFINITE : MAX_BLEND_DISTANCE;
+    const blendRate = Math.min(magnitude / maxBlendDistance, 1);
     const nextRotation = initialState.current.rotate * (1 - blendRate) + rotation * blendRate;
-    onChangeThrottled(-nextRotation / (Math.PI * (infinite ? 2 : 1.5)));
+    const nextState = -nextRotation / (Math.PI * (infinite ? 2 : 1.5));
+
+    onChangeThrottled(nextState);
+
+    if (infinite) {
+      boneRotate.set(nextRotation);
+      return;
+    }
+
     void boneRotate.start(nextRotation);
   };
 

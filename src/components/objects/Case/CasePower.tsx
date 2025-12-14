@@ -1,11 +1,7 @@
 import { animated, useSpring } from '@react-spring/three';
-import { useLoader } from '@react-three/fiber';
 import { throttle } from 'es-toolkit';
 import { useEffect, useMemo, useState } from 'react';
-import { AudioLoader } from 'three';
-import UindowsBootSound from '@/assets/audio/uindows-boot.mp3?url';
-import UindowsOffSound from '@/assets/audio/uindows-off.mp3?url';
-import { useSynthesize } from '@/components/audio/SynthesizeProvider';
+import { useSynthesizePower } from '@/components/audio/SynthesizePowerProvider';
 import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { DEG2RAD } from '@/constants';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
@@ -28,15 +24,19 @@ export const CasePower = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
     }
   }, [isPoweredOn, isPoweredOnInternal]);
 
-  const playAudio = useSynthesize(state => state.playAudio);
-  const uindowsBootSoundBuffer = useLoader(AudioLoader, UindowsBootSound);
-  const uindowsOffSoundBuffer = useLoader(AudioLoader, UindowsOffSound);
-
+  const synthesizePowerOn = useSynthesizePower(state => state.synthesizePowerOn);
+  const synthesizePowerOff = useSynthesizePower(state => state.synthesizePowerOff);
   const togglePowerUpDown = useLatestCallback(() => {
-    setTimeout(() => {
-      playAudio(isPoweredOnInternal ? uindowsOffSoundBuffer : uindowsBootSoundBuffer);
-      setIsPoweredOnInternal(!isPoweredOnInternal);
-    }, 300);
+    if (!isPoweredOnInternal) {
+      synthesizePowerOn();
+    } else {
+      synthesizePowerOff();
+    }
+
+    setTimeout(
+      () => setIsPoweredOnInternal(!isPoweredOnInternal),
+      !isPoweredOnInternal ? 300 : 1000
+    );
   });
 
   const togglePowerUpDownThrottled = useMemo(() => throttle(togglePowerUpDown, 3000), []);
@@ -72,6 +72,3 @@ export const CasePower = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
     </group>
   );
 };
-
-useLoader.preload(AudioLoader, UindowsBootSound);
-useLoader.preload(AudioLoader, UindowsOffSound);

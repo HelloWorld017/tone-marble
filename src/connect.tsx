@@ -144,6 +144,25 @@ const ConnectApp = () => {
     return () => clearInterval(intervalId);
   }, [connection]);
 
+  const [wakeSentinel, setWakeSentinel] = useState<WakeLockSentinel | null>(null);
+  useEffect(() => {
+    if (!wakeSentinel) {
+      return () => {};
+    }
+
+    const onRelease = () => {
+      setWakeSentinel(null);
+    };
+
+    wakeSentinel.addEventListener('release', onRelease);
+
+    return () => {
+      wakeSentinel.removeEventListener('release', onRelease);
+      wakeSentinel.release().catch(() => {});
+      onRelease();
+    };
+  }, [wakeSentinel]);
+
   return (
     <ThemeProvider theme={DEFAULT_THEME}>
       <Global styles={globalStyle} />
@@ -159,6 +178,19 @@ const ConnectApp = () => {
             }}
           >
             Allow Permissions
+          </button>
+        )}
+        {connection && !requestPermission && !wakeSentinel && 'wakeLock' in navigator && (
+          <button
+            type="button"
+            onClick={() => {
+              navigator.wakeLock
+                .request('screen')
+                .then(sentinel => setWakeSentinel(sentinel))
+                .catch(() => {});
+            }}
+          >
+            Active Wakelock
           </button>
         )}
       </div>
