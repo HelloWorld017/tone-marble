@@ -1,15 +1,22 @@
 import { animated, useTransition as useSpringTransition } from '@react-spring/web';
 import { useEffect, useRef, useState } from 'react';
-import { IconCog, IconGamepad } from '@/assets/icons/lucide';
+import { IconCog, IconGamepad, IconTriangleAlert } from '@/assets/icons/lucide';
+import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { useLatestRef } from '@/hooks/useLatestRef';
 import * as styles from './Sidebar.css';
 import { Config } from './config/Config';
 import { Controllers } from './controllers/Controllers';
+import { Warning } from './warning/Warning';
 import type { ReactNode } from 'react';
 
-type TabKind = 'controllers' | 'config';
+type TabKind = 'controllers' | 'config' | 'warning';
 
 const TABS: Record<TabKind, { icon: ReactNode; element: ReactNode }> = {
+  warning: {
+    icon: <IconTriangleAlert strokeWidth={2} />,
+    element: <Warning />,
+  },
+
   controllers: {
     icon: <IconGamepad strokeWidth={2} />,
     element: <Controllers />,
@@ -25,6 +32,15 @@ export const Sidebar = () => {
   const [selectedTab, setSelectedTab] = useState<TabKind | null>(null);
   const selectedTabRef = useLatestRef(selectedTab);
   const rootRef = useRef<HTMLDivElement | null>(null);
+
+  const isPoweredOn = useInterfaceState(state => state.isPoweredOn);
+  const isWarningOn = !isPoweredOn;
+
+  useEffect(() => {
+    if (!isWarningOn && selectedTab == 'warning') {
+      setSelectedTab(null);
+    }
+  }, [isWarningOn, selectedTab]);
 
   useEffect(() => {
     const onClickOutside = (e: PointerEvent) => {
@@ -54,18 +70,21 @@ export const Sidebar = () => {
   return (
     <div ref={rootRef}>
       <aside css={styles.asideStyle}>
-        {Object.entries(TABS).map(([key, { icon }]) => (
-          <button
-            key={key}
-            css={styles.asideItemStyle(selectedTab === key)}
-            type="button"
-            onClick={() =>
-              selectedTab === key ? setSelectedTab(null) : setSelectedTab(key as TabKind)
-            }
-          >
-            {icon}
-          </button>
-        ))}
+        {Object.entries(TABS).map(
+          ([key, { icon }]) =>
+            (key !== 'warning' || isWarningOn) && (
+              <button
+                key={key}
+                css={styles.asideItemStyle(selectedTab === key)}
+                type="button"
+                onClick={() =>
+                  selectedTab === key ? setSelectedTab(null) : setSelectedTab(key as TabKind)
+                }
+              >
+                {icon}
+              </button>
+            )
+        )}
       </aside>
 
       <main>

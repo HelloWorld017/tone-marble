@@ -6,6 +6,7 @@ import {
   Link2OffIcon,
   PercentIcon,
   SmartphoneIcon,
+  TriangleAlertIcon,
   XIcon,
 } from 'lucide-react';
 import type { ComponentProps, ComponentType } from 'react';
@@ -24,4 +25,5 @@ export const IconGamepad = wrapLucideComponent(Gamepad2Icon);
 export const IconLinkOff = wrapLucideComponent(Link2OffIcon);
 export const IconPercent = wrapLucideComponent(PercentIcon);
 export const IconSmartphone = wrapLucideComponent(SmartphoneIcon);
+export const IconTriangleAlert = wrapLucideComponent(TriangleAlertIcon);
 export const IconX = wrapLucideComponent(XIcon);

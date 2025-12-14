@@ -9,6 +9,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
+        docs: path.resolve(__dirname, 'docs/index.html'),
         connect: path.resolve(__dirname, 'connect/index.html'),
       },
     },

@@ -54,77 +54,83 @@ import { MotivationImages } from './components/MotivationImages'
 
 <br />
 
-Above is the landing page, which illustrates my final project, of a virtual product from a virtual company.
+Above is the landing page illustrating my final project: a virtual product from a fictional company.
 
 ### Motivation
 
-I wanted to create a decent, unrealistic instrument.
-When I was seeking for ideas, following things got into my mind, and I was able to make my ideas concrete.
+I aimed to create a polished, yet unrealistic, instrument.
+While brainstorming, the following influences got into my mind, and helped make my abstract ideas concrete.
 
 <br />
 <MotivationImages />
 <br />
 
 * **Rainstick** / **Marbles Automata**  
-  I got the main idea from them.
+  Provided the core concept.
 
 * **Pinball**  
-  I got the idea of playing sounds whenever the marble hits something.
+  Inspired the mechanic of triggering sounds upon marble collisions.
 
 * **Cactus Plush**  
-  I got the idea of speech-feedback loop.
+  Inspired the speech-feedback loop mechanism.
 
 * **Darth Vader Chrome Experiment**  
-  I got the idea of the motion control.
+  Inspired the motion control idea.
 
 * **Teenage Engineering**  
-  Inspired from its aesthetics.
+  Inspired the aesthetic design.
 
 * **Shigure Ui**  
-  Inspired from her streaming start video clip.  
-  Also, her streaming was useful for leaving it on and coding.
+  Inspired by her stream intro clip.  
+  Additionally, her streams were excellent background companions for coding.
 
-So, my ideas are basically an experiment: whether very chaotic nature of physics sounds good if a bit of entropy is reduced (and it is the pitch).
-After I thought the idea, of stochastic sounds tuned to pitch, I was not sure whether it sounds nice or not.  
+<br />
 
-So I started from implementing minimal pitch detector example, then I recorded the pitches, and synthesized it with the ChucK programming language.  
+Essentially, this project is an experiment to determine if the chaotic nature of physics can sound musical when entropy is reduced — specifically by constraining the pitch.  
 
-And the result is: I became more uncertained whether it will work or not. But fortunately, after implementing the whole project, it was not as bad as I initially thought.
+After conceiving the idea of stochastic sounds tuned to specific pitches, I was unsure if the result would be pleasing.
+So I started by implementing a minimal pitch detector, recording the pitches, and synthesizing the output using the ChucK programming language.
+
+And the result is: I became even more uncertain about its viability. Fortunately, after implementing the full project, the outcome was not as bad as I had feared.
 
 ### Main Idea
 
-The TM-07's main idea is a **cascade of marbles**;  
-When the marble collides with pillars, sound matching current chroma feature is played.
-There are three kinds of sound: Winds, Glass and Sand.  
+The TM-07's core concept is a **cascade of marbles**;  
+When a marble collides with a pillar, a sound matching the current chroma feature plays.
+There are three timbres: Winds, Glass, and Sand.  
 
-The notion of 'current chroma feature' comes from the pitch detectors or the MIDI input.  
-When the players sing a song, whistles or play a note directly, the system recognizes current chroma feature and tunes the synthesizers.
+The 'current chroma feature' is derived from pitch detectors or MIDI input.  
+When a player sings, whistles, or plays a note, the system recognizes the chroma and tunes the synthesizers accordingly.
 
 ### Technical Details
 The TM-07 consists of five layers:
 <img src={ImageTM07Structure} alt="Layers" />
 
 * **Chroma Detection**  
-  Three chroma detection techniques used: `Crepe`, `Spice` and `FFT`.  
-  Initially I tried with the neural pitch detectors, Crepe and Spice, but as the performance of both detectors was not so very good (might because it is trimmed model), I created an ad-hoc FFT chroma detector.  
-  You can choose it from the settings.
+  Three chroma detection techniques are used: `Crepe`, `Spice` and `FFT`.  
+  Initially, I tested neural pitch detectors (Crepe and Spice), but as their performance was suboptimal (likely because I used trimmed models), I created an ad-hoc FFT chroma detector.  
+  You can select the preferred method in the settings.
 
-* **Synthesize**  
+* **Synthesis**  
   Three synthesizers implemented in WebAudio: `Wind`, `Glass` and `Sand`.
-  They use additive & subtractive synthesis.  
-  Also the synthesizers for `Lo-Fi Vinyl Scratch` sound and `Kick & Hi-hat` sound, `Power Turn On/Off` sound (disclaimer: is used along with the sound clip) are implemented.
+  These utilize additive & subtractive synthesis.  
+  Synthesizers for `Lo-Fi Vinyl Scratch`, `Kick & Hi-hat`, and `Power Turn On/Off` (disclaimer: used in conjunction with a sound clip) are also implemented.
 
 * **Controller**  
-  The motion of the smartphone is directly sent to the laptop using WebRTC.  
-  Internally uses [PeerJS's signaling server](https://status.peerjs.com/) but except that, it is serverless.
+  Smartphone's motion data is sent directly to the laptop via WebRTC.
+  Internally uses [PeerJS's signaling server](https://status.peerjs.com/), but except that, it is serverless.
 
 * **Physics**  
-  Detects collision strength and position, then synthesizes sound using stereo panning effect. Uses rapier3d physics engine.
+  Detects collision strength and position, then synthesizes sound with stereo panning. Powered by the rapier3d physics engine.
 
 * **Interface**  
-  Handles player's input and updates internal state. The interface was modelled and rigged in blender, and rendered using react-three.
+  Handles user input and updates the internal state. The interface was modeled and rigged in Blender and rendered using react-three.
 
 
+### Aesthetics / Fun / Attractive Aspects
+Why don't you experience it firsthand?
+
+<a class="cta" href="/">Try it now</a>  
 </section>
 
 <div style={{ height: "30vh" }} />
