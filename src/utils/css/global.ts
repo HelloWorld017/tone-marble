@@ -1,5 +1,7 @@
 import 'pretendard-jp/dist/web/static/PretendardJP-Regular.css';
 import 'pretendard-jp/dist/web/static/PretendardJP-SemiBold.css';
+import '@fontsource/space-grotesk/700.css';
+import '@fontsource/space-grotesk/400.css';
 
 import { css } from '@emotion/react';
 

@@ -25,4 +25,16 @@ export const DEFAULT_THEME = {
   },
 };
 
+export const LIGHT_THEME: Theme = {
+  ...DEFAULT_THEME,
+  colors: {
+    bgBase: '#fafafa',
+    bgElevated: '#f0f0f0',
+    fillPrimary: '#101010',
+    fillSecondary: 'rgba(0, 0, 0, .5)',
+    fillHighlight: '#1179f8',
+    fillLine: 'rgba(0, 0, 0, .1)',
+  },
+};
+
 export type Theme = typeof DEFAULT_THEME;

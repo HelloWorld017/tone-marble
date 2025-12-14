@@ -1,0 +1,130 @@
+import ImageToneMarbleMain from './assets/images/tone-marble-main.webp';
+import ImageTM07Structure from './assets/images/tm07-structure.png';
+import { CirclesPanout } from './components/CirclesPanout';
+import { Footer } from './components/Footer';
+import { FullWidthImage } from './components/FullWidthImage';
+import { SiriWave } from './components/SiriWave';
+import { MotivationImages } from './components/MotivationImages'
+
+<section>
+  # TM-07 <span>: An unrealistic instrument</span>
+
+  <a class="cta" href="/">Try it now</a>
+</section>
+
+<section>
+  ## <i>01</i> A Modern Artifact <span>_ Precision engineering meets organic tranquility</span>
+
+  The TM-07, while being an instrument, is a piece of desk sculpture designed to inspire.  
+  The design language strips away the unnecessary, leaving only a sleek, pocketable form factor that bridges the gap between a high-fidelity audio tool and a modernist art object.  
+  It looks as beautiful silent as it sounds when active.
+</section>
+
+<br />
+<FullWidthImage class="main-image" src={ImageToneMarbleMain} />
+
+<section>
+  ## <i>02</i> Kinetic Synthesis Engine <span>_ The physics of sound, visualized and heard.</span>
+  At the heart of the Tone-Marble is a gravity-defying physics engine.
+  Tilt your mobile device to release a cascade of virtual marbles.
+  As they collide with digital internal pillars, they trigger a generative soundscape based on three elemental textures: Wind, Glass, and Sand.  
+  Your rhythms evolve with the angle of your hand.
+</section>
+
+
+<CirclesPanout />
+
+<section>
+  ## <i>03</i> Sympathetic Resonance <span>_ It listens, it harmonizes, it flows.</span>
+  The TM-07 creates a dialogue with its player. Utilizing a microphone or MIDI, the device detects your vocal pitch or instrumental input and instantly tunes the virtual marbles to a matching key, creating a seamless harmony.  
+
+  As you increase the velocity of the rolling marbles, the TM-07 introduces a dynamic layer of lo-fi crackle and rhythmic static, syncing the background noise to the physical speed of the simulation. It is the perfect companion for finding focus in chaos.
+</section>
+
+<SiriWave />
+
+<Footer />
+
+<div style={{ height: "500px" }} />
+
+<section>
+**Final Project**  
+2025 Fall CTP.40031  
+`Yohan Kim`
+
+<br />
+
+Above is the landing page, which illustrates my final project, of a virtual product from a virtual company.
+
+### Motivation
+
+I wanted to create a decent, unrealistic instrument.
+When I was seeking for ideas, following things got into my mind, and I was able to make my ideas concrete.
+
+<br />
+<MotivationImages />
+<br />
+
+* **Rainstick** / **Marbles Automata**  
+  I got the main idea from them.
+
+* **Pinball**  
+  I got the idea of playing sounds whenever the marble hits something.
+
+* **Cactus Plush**  
+  I got the idea of speech-feedback loop.
+
+* **Darth Vader Chrome Experiment**  
+  I got the idea of the motion control.
+
+* **Teenage Engineering**  
+  Inspired from its aesthetics.
+
+* **Shigure Ui**  
+  Inspired from her streaming start video clip.  
+  Also, her streaming was useful for leaving it on and coding.
+
+So, my ideas are basically an experiment: whether very chaotic nature of physics sounds good if a bit of entropy is reduced (and it is the pitch).
+After I thought the idea, of stochastic sounds tuned to pitch, I was not sure whether it sounds nice or not.  
+
+So I started from implementing minimal pitch detector example, then I recorded the pitches, and synthesized it with the ChucK programming language.  
+
+And the result is: I became more uncertained whether it will work or not. But fortunately, after implementing the whole project, it was not as bad as I initially thought.
+
+### Main Idea
+
+The TM-07's main idea is a **cascade of marbles**;  
+When the marble collides with pillars, sound matching current chroma feature is played.
+There are three kinds of sound: Winds, Glass and Sand.  
+
+The notion of 'current chroma feature' comes from the pitch detectors or the MIDI input.  
+When the players sing a song, whistles or play a note directly, the system recognizes current chroma feature and tunes the synthesizers.
+
+### Technical Details
+The TM-07 consists of five layers:
+<img src={ImageTM07Structure} alt="Layers" />
+
+* **Chroma Detection**  
+  Three chroma detection techniques used: `Crepe`, `Spice` and `FFT`.  
+  Initially I tried with the neural pitch detectors, Crepe and Spice, but as the performance of both detectors was not so very good (might because it is trimmed model), I created an ad-hoc FFT chroma detector.  
+  You can choose it from the settings.
+
+* **Synthesize**  
+  Three synthesizers implemented in WebAudio: `Wind`, `Glass` and `Sand`.
+  They use additive & subtractive synthesis.  
+  Also the synthesizers for `Lo-Fi Vinyl Scratch` sound and `Kick & Hi-hat` sound, `Power Turn On/Off` sound (disclaimer: is used along with the sound clip) are implemented.
+
+* **Controller**  
+  The motion of the smartphone is directly sent to the laptop using WebRTC.  
+  Internally uses [PeerJS's signaling server](https://status.peerjs.com/) but except that, it is serverless.
+
+* **Physics**  
+  Detects collision strength and position, then synthesizes sound using stereo panning effect. Uses rapier3d physics engine.
+
+* **Interface**  
+  Handles player's input and updates internal state. The interface was modelled and rigged in blender, and rendered using react-three.
+
+
+</section>
+
+<div style={{ height: "30vh" }} />
