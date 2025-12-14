@@ -89,7 +89,7 @@ const NoDeviceConnected = () => {
       <div css={styles.sectionStyle}>
         <div css={styles.guideStyle}>
           <div css={styles.rowTitleStyle}>Connection Guide</div>
-          <div css={styles.guideContentStyle}>
+          <div css={styles.contentStyle}>
             Open your phone, then navigate to following link.
             <code css={styles.urlStyle}>{url}</code>
           </div>

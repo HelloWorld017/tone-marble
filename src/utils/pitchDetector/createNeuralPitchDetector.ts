@@ -107,8 +107,8 @@ const loadModel = (modelKind: PitchModelKind) =>
     .then(
       (): Promise<tf.LayersModel | tf.GraphModel> =>
         modelKind === 'crepe'
-          ? tf.loadLayersModel('/assets/neuralnets/crepe/model.json')
-          : tf.loadGraphModel('/assets/neuralnets/spice/model.json')
+          ? tf.loadLayersModel('./assets/neuralnets/crepe/model.json')
+          : tf.loadGraphModel('./assets/neuralnets/spice/model.json')
     );
 
 let modelPromise = {

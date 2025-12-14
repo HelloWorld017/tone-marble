@@ -1,6 +1,7 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
+import { useInterfaceState } from '../providers/InterfaceStateProvider';
 import { useAudioContext } from './AudioContextProvider';
 import { useConnectNodeChain } from './hooks/useConnectNode';
 import { useDynamicsCompressor } from './hooks/useDynamicsCompressor';
@@ -12,7 +13,15 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
   const listenerPosition = useRef<Position>([0, 0, 0]);
 
   const ctx = useAudioContext();
-  const masterCompressor = useDynamicsCompressor({ threshold: -10, ratio: 12 }, ctx?.destination);
+  const additionalGainValue = useInterfaceState(state => state.additionalGain);
+  const additionalGain = useGain({ gain: 1 }, ctx?.destination);
+  useEffect(() => {
+    if (additionalGain) {
+      additionalGain.gain.value = additionalGainValue;
+    }
+  }, [additionalGainValue]);
+
+  const masterCompressor = useDynamicsCompressor({ threshold: -10, ratio: 12 }, additionalGain);
   const effectChainInput = useGain({ gain: 1 }, null);
   const [effects, setEffects] = useState<[AudioNode, AudioNode][]>([]);
   useConnectNodeChain(effectChainInput, effects, masterCompressor);

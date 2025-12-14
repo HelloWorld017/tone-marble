@@ -1,26 +1,15 @@
 import { css } from '@emotion/react';
 import type { Theme } from '@emotion/react';
 
-export const titleStyle = (theme: Theme) => css`
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: ${theme.colors.fillPrimary};
-  text-transform: uppercase;
-`;
-
-export const rowStyle = css`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 0.6rem;
-  gap: 1.2rem;
-`;
-
-export const rowTitleStyle = (theme: Theme) => css`
-  font-size: 1.2rem;
-  line-height: 1.4rem;
-  color: ${theme.colors.fillPrimary};
-`;
+export {
+  titleStyle,
+  rowStyle,
+  rowTitleStyle,
+  rangeStyle,
+  rangeTrackStyle,
+  rangeInputStyle,
+  rangeHandleStyle,
+} from '../index.css';
 
 export const selectStyle = (theme: Theme) => css`
   position: relative;

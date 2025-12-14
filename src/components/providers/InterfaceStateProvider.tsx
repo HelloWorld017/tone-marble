@@ -72,6 +72,7 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
   const [volume, setVolume] = useState(1);
 
   const [pitchModelKind, setPitchModelKind] = useState<PitchModelKind | 'fft'>('fft');
+  const [additionalGain, setAdditionalGain] = useState(1);
 
   return {
     // Cursor Management
@@ -110,6 +111,8 @@ export const [InterfaceStateProvider, useInterfaceState] = buildContext(() => {
 
     // UI
     pitchModelKind,
+    additionalGain,
     setPitchModelKind,
+    setAdditionalGain,
   };
 });
