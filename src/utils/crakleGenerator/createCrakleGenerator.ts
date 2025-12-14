@@ -1,4 +1,4 @@
-import crakleGeneratorWorklet from './worklet?url';
+import crakleGeneratorWorklet from './worklet?worker&url';
 
 const workletEnabledContext = new WeakSet<AudioContext>();
 

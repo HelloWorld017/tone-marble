@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { AudioLoader } from 'three';
 import ToggleTickSound from '@/assets/audio/toggle-tick.mp3';
 import ToggleTockSound from '@/assets/audio/toggle-tock.mp3';
-import UindowsBootSound from '@/assets/audio/uindows-boot.mp3?url';
+import UindowsBootSound from '@/assets/audio/uindows-boot.mp3';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
 import { useAudioContext } from './AudioContextProvider';

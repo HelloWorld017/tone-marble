@@ -1,4 +1,4 @@
-import volumeProcessorWorklet from './worklet?url';
+import volumeProcessorWorklet from './worklet?worker&url';
 
 const workletEnabledContext = new WeakSet<AudioContext>();
 

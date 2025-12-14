@@ -1,5 +1,5 @@
 import { coerceToChromatic } from './coerceToChromatic';
-import metronomeProcessorWorklet from './metronomeWorklet?url';
+import metronomeProcessorWorklet from './metronomeWorklet?worker&url';
 
 const NOISE_THRESHOLD = -100;
 const MIN_FREQUENCY = 32;

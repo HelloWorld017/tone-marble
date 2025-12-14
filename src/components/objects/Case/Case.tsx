@@ -1,6 +1,6 @@
 import { useGLTF } from '@react-three/drei';
 import CaseObject from '@/assets/objects/case.glb?url';
-import LightmapTexture from '@/assets/textures/lightmap.webp?url';
+import LightmapTexture from '@/assets/textures/lightmap.webp';
 import { useLightMap } from '@/hooks/useLightMap';
 import { CaseButtons } from './CaseButtons';
 import { CaseIndicator } from './CaseIndicator';

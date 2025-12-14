@@ -22,7 +22,7 @@ import {
   Vector2,
 } from 'three';
 import UnfinishedOfficeHDRI from '@/assets/hdris/unfinished_office_1k.exr?url';
-import CloudTexture from '@/assets/textures/cloud.png?url';
+import CloudTexture from '@/assets/textures/cloud.png';
 import { DEG2RAD, PILLAR_ROWS } from '@/constants';
 import { useAudioContext } from './audio/AudioContextProvider';
 import { useSynthesize } from './audio/SynthesizeProvider';

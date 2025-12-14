@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgpu';
 
 import { exhaustive } from '@/utils/exhaustive';
-import sampleProcessorWorklet from './sampleWorklet?url';
+import sampleProcessorWorklet from './sampleWorklet?worker&url';
 
 export type PitchModelKind = 'crepe' | 'spice';
 export interface PitchResult {
