@@ -17,7 +17,7 @@
     // Types
     "target": "es2022",
     "lib": ["es2022", "dom"],
-    "types": ["audioworklet", "node", "vite/client"],
+    "types": ["audioworklet", "node", "vite/client", "vite-plugin-svgr/client"],
     "typeRoots": [
       "./node_modules",
       "./node_modules/@types"

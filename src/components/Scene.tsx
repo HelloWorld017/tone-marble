@@ -2,11 +2,9 @@ import {
   Cloud,
   Clouds,
   Environment,
-  Html,
   OrbitControls,
   PerspectiveCamera,
   Preload,
-  useProgress,
 } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import {
@@ -23,6 +21,8 @@ import {
   MeshBasicMaterial,
   Vector2,
 } from 'three';
+import UnfinishedOfficeHDRI from '@/assets/hdris/unfinished_office_1k.exr?url';
+import CloudTexture from '@/assets/textures/cloud.png?url';
 import { DEG2RAD, PILLAR_ROWS } from '@/constants';
 import { useAudioContext } from './audio/AudioContextProvider';
 import { useSynthesize } from './audio/SynthesizeProvider';
@@ -32,10 +32,12 @@ import { Frame } from './objects/Frame';
 import { Marbles } from './objects/Marbles';
 import { Pillars } from './objects/Pillars';
 import { useInterfaceState } from './providers/InterfaceStateProvider';
+import { Progress } from './ui/Progress';
 
 const SceneEnvironment = () => {
   const isPoweredOn = useInterfaceState(state => state.isPoweredOn);
   const intensity = useFluorescentBlink(isPoweredOn);
+
   return (
     <>
       <directionalLight
@@ -44,8 +46,8 @@ const SceneEnvironment = () => {
         castShadow
         shadow-mapSize={[2048, 2048]}
       />
-      <Environment preset="city" environmentIntensity={intensity * 0.3} />
-      <Clouds material={MeshBasicMaterial}>
+      <Environment files={UnfinishedOfficeHDRI} environmentIntensity={intensity * 0.3} />
+      <Clouds texture={CloudTexture} material={MeshBasicMaterial}>
         <Cloud
           seed={1}
           segments={15}
@@ -136,16 +138,11 @@ const SceneOrbitControls = () => {
   return <OrbitControls target={[0, 0, 0]} enabled={!activeTarget} />;
 };
 
-const SceneProgress = () => {
-  const { progress } = useProgress();
-  return <Html center>{progress.toFixed(2)} % loaded</Html>;
-};
-
 export const Scene = () => (
   <div style={{ width: '100vw', height: '100vh' }}>
     <Canvas shadows flat>
       <PerspectiveCamera makeDefault position={[0, 0, 30]} fov={50} near={0.01} far={500} />
-      <Suspense fallback={<SceneProgress />}>
+      <Suspense fallback={<Progress />}>
         <color attach="background" args={['#c0c0c0']} />
         <SceneAudioListener />
         <SceneEffects />

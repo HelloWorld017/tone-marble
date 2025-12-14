@@ -1,7 +1,7 @@
 import path from 'node:path';
-import svgr from '@svgr/rollup';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
+import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
   build: {
@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
 
-  plugins: [react({ jsxImportSource: '@emotion/react' }), svgr({ svgo: false })],
+  plugins: [react({ jsxImportSource: '@emotion/react' }), svgr({ svgrOptions: { svgo: false } })],
   publicDir: path.resolve(__dirname, 'public'),
   resolve: {
     alias: { '@': path.resolve(__dirname, 'src') },
