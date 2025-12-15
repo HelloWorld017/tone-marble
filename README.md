@@ -1,3 +1,5 @@
+![Main Image](./src/docs/assets/images/tone-marble-main.webp)
+
 ## Tone Marble
 > TM-07: An unrealistic instrument
 
