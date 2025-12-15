@@ -32,7 +32,9 @@ export const contentStyle = (theme: Theme) => css`
   }
 
   a {
-    color: ${theme.colors.fillHighlight};
+    color: ${theme.colors.fillSecondary};
+    text-decoration: underline;
+    text-underline-offset: 0.6rem;
   }
 
   a.cta {
@@ -42,6 +44,7 @@ export const contentStyle = (theme: Theme) => css`
     font-size: 2rem;
     background: ${theme.colors.fillTertiary};
     color: ${theme.colors.bgBase};
+    text-decoration: none;
 
     &.secondary {
       margin-top: 2rem;
@@ -175,5 +178,11 @@ export const contentStyle = (theme: Theme) => css`
     @media (max-width: 768px) {
       flex-direction: column;
     }
+  }
+
+  .taglist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
   }
 `;
