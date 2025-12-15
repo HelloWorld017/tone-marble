@@ -1,4 +1,5 @@
 import {
+  ArrowUpRightIcon,
   BubblesIcon,
   ChevronDownIcon,
   CogIcon,
@@ -19,6 +20,7 @@ const wrapLucideComponent =
     return <Icon width="1em" height="1em" {...props} />;
   };
 
+export const IconArrowUpRight = wrapLucideComponent(ArrowUpRightIcon);
 export const IconBubbles = wrapLucideComponent(BubblesIcon);
 export const IconChevronDown = wrapLucideComponent(ChevronDownIcon);
 export const IconCog = wrapLucideComponent(CogIcon);

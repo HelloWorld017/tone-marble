@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { IconChevronDown } from '@/assets/icons/lucide';
+import { IconArrowUpRight, IconChevronDown } from '@/assets/icons/lucide';
 import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import * as styles from './Config.css';
 import type { PitchModelKind } from '@/utils/pitchDetector';
@@ -50,6 +50,13 @@ export const Config = () => {
             onChange={e => setAdditionalGain(1 + e.currentTarget.valueAsNumber / 50)}
           />
         </label>
+      </div>
+      <div css={styles.sectionStyle}>
+        <div css={styles.rowTitleStyle}>More about this instrument</div>
+        <br />
+        <a href="./docs" css={styles.buttonStyle}>
+          Full Post <IconArrowUpRight />
+        </a>
       </div>
     </>
   );

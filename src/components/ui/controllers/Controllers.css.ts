@@ -10,6 +10,7 @@ export {
   rangeTrackStyle,
   rangeInputStyle,
   rangeHandleStyle,
+  sectionStyle,
 } from '../index.css';
 
 export const rangeStyle = css`
@@ -22,12 +23,6 @@ export const headerStyle = css`
   align-items: center;
   justify-content: space-between;
   margin-top: 0.6rem;
-`;
-
-export const sectionStyle = (theme: Theme) => css`
-  margin-top: 1.6rem;
-  border-top: 1px solid ${theme.colors.fillLine};
-  padding-top: 1.6rem;
 `;
 
 export const guideStyle = css`

@@ -9,7 +9,30 @@ export {
   rangeTrackStyle,
   rangeInputStyle,
   rangeHandleStyle,
+  sectionStyle,
 } from '../index.css';
+
+export const buttonStyle = (theme: Theme) => css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+
+  width: 100%;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid ${theme.colors.fillLine};
+  border-radius: 0.8rem;
+  background: ${theme.colors.bgElevated};
+
+  font-size: 1.2rem;
+  color: ${theme.colors.fillPrimary};
+  transition: all ${theme.easings.default};
+
+  &:hover {
+    background: rgb(from ${theme.colors.bgElevated} r g b / 0.8);
+    border-color: rgb(from ${theme.colors.fillLine} r g b / 0.05);
+  }
+`;
 
 export const selectStyle = (theme: Theme) => css`
   position: relative;

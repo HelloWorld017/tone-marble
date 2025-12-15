@@ -28,6 +28,12 @@ export const rowTitleStyle = (theme: Theme) => css`
   color: ${theme.colors.fillPrimary};
 `;
 
+export const sectionStyle = (theme: Theme) => css`
+  margin-top: 1.6rem;
+  border-top: 1px solid ${theme.colors.fillLine};
+  padding-top: 1.6rem;
+`;
+
 export const rangeStyle = css`
   position: relative;
   display: flex;
