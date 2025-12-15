@@ -54,7 +54,7 @@ export const Config = () => {
       <div css={styles.sectionStyle}>
         <div css={styles.rowTitleStyle}>More about this instrument</div>
         <br />
-        <a href="./docs" css={styles.buttonStyle}>
+        <a css={styles.buttonStyle} href="./docs" target="_blank">
           Full Post <IconArrowUpRight />
         </a>
       </div>
