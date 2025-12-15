@@ -2,6 +2,7 @@ import {
   BubblesIcon,
   ChevronDownIcon,
   CogIcon,
+  FileTextIcon,
   Gamepad2Icon,
   Link2OffIcon,
   PercentIcon,
@@ -21,6 +22,7 @@ const wrapLucideComponent =
 export const IconBubbles = wrapLucideComponent(BubblesIcon);
 export const IconChevronDown = wrapLucideComponent(ChevronDownIcon);
 export const IconCog = wrapLucideComponent(CogIcon);
+export const IconFileText = wrapLucideComponent(FileTextIcon);
 export const IconGamepad = wrapLucideComponent(Gamepad2Icon);
 export const IconLinkOff = wrapLucideComponent(Link2OffIcon);
 export const IconPercent = wrapLucideComponent(PercentIcon);

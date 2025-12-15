@@ -1,6 +1,6 @@
 import { animated, useTransition as useSpringTransition } from '@react-spring/web';
 import { useEffect, useRef, useState } from 'react';
-import { IconCog, IconGamepad, IconTriangleAlert } from '@/assets/icons/lucide';
+import { IconCog, IconFileText, IconGamepad, IconTriangleAlert } from '@/assets/icons/lucide';
 import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { useLatestRef } from '@/hooks/useLatestRef';
 import * as styles from './Sidebar.css';
@@ -11,21 +11,10 @@ import type { ReactNode } from 'react';
 
 type TabKind = 'controllers' | 'config' | 'warning';
 
-const TABS: Record<TabKind, { icon: ReactNode; element: ReactNode }> = {
-  warning: {
-    icon: <IconTriangleAlert strokeWidth={2} />,
-    element: <Warning />,
-  },
-
-  controllers: {
-    icon: <IconGamepad strokeWidth={2} />,
-    element: <Controllers />,
-  },
-
-  config: {
-    icon: <IconCog strokeWidth={2} />,
-    element: <Config />,
-  },
+const TABS: Record<TabKind, ReactNode> = {
+  warning: <Warning />,
+  controllers: <Controllers />,
+  config: <Config />,
 };
 
 export const Sidebar = () => {
@@ -67,24 +56,26 @@ export const Sidebar = () => {
     keys: kind => kind ?? '',
   });
 
+  const renderAsideItem = (key: TabKind, icon: ReactNode) => (
+    <button
+      key={key}
+      css={styles.asideItemStyle(selectedTab === key)}
+      type="button"
+      onClick={() => (selectedTab === key ? setSelectedTab(null) : setSelectedTab(key))}
+    >
+      {icon}
+    </button>
+  );
+
   return (
     <div ref={rootRef}>
       <aside css={styles.asideStyle}>
-        {Object.entries(TABS).map(
-          ([key, { icon }]) =>
-            (key !== 'warning' || isWarningOn) && (
-              <button
-                key={key}
-                css={styles.asideItemStyle(selectedTab === key)}
-                type="button"
-                onClick={() =>
-                  selectedTab === key ? setSelectedTab(null) : setSelectedTab(key as TabKind)
-                }
-              >
-                {icon}
-              </button>
-            )
-        )}
+        {renderAsideItem('warning', <IconTriangleAlert strokeWidth={2} />)}
+        <a href="./docs/" css={styles.asideItemStyle(false)}>
+          <IconFileText strokeWidth={2} />
+        </a>
+        {renderAsideItem('controllers', <IconGamepad strokeWidth={2} />)}
+        {renderAsideItem('config', <IconCog strokeWidth={2} />)}
       </aside>
 
       <main>
@@ -92,7 +83,7 @@ export const Sidebar = () => {
           (style, kind) =>
             kind && (
               <animated.div css={styles.contentsStyle} style={style}>
-                {TABS[kind].element}
+                {TABS[kind]}
               </animated.div>
             )
         )}
