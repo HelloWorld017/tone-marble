@@ -12,6 +12,7 @@ import {
   ChromaticAberration,
   EffectComposer,
   ToneMapping,
+  TiltShift2,
 } from '@react-three/postprocessing';
 import { Physics } from '@react-three/rapier';
 import { Suspense, useEffect } from 'react';
@@ -117,10 +118,11 @@ const SceneAudioListener = () => {
   return <></>;
 };
 
-const SceneEffects = ({ useChromaticAberration = false }) => (
+const SceneEffects = ({ useChromaticAberration = false, useTiltShift = false }) => (
   <EffectComposer>
     <Bloom />
     <ToneMapping />
+
     {useChromaticAberration ? (
       <ChromaticAberration
         offset={new Vector2(0.003, 0.003)}
@@ -130,6 +132,7 @@ const SceneEffects = ({ useChromaticAberration = false }) => (
     ) : (
       <></>
     )}
+    {useTiltShift ? <TiltShift2 taper={0.9} /> : <></>}
   </EffectComposer>
 );
 

@@ -40,14 +40,14 @@ export const contentStyle = (theme: Theme) => css`
     margin-top: 3rem;
     padding: 1rem 2rem;
     font-size: 2rem;
-    background: #808080;
-    color: #ffffff;
+    background: ${theme.colors.fillTertiary};
+    color: ${theme.colors.bgBase};
 
     &.secondary {
       margin-top: 2rem;
       background: transparent;
-      border: 4px solid #808080;
-      color: #808080;
+      border: 4px solid ${theme.colors.fillTertiary};
+      color: ${theme.colors.fillTertiary};
       font-weight: 600;
     }
 
@@ -109,13 +109,19 @@ export const contentStyle = (theme: Theme) => css`
     }
   }
 
-  h3 {
+  h3,
+  h4 {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 3rem;
     line-height: 3.6rem;
     font-weight: 600;
     margin-top: 3.6rem;
     color: ${theme.colors.fillPrimary};
+  }
+
+  h4 {
+    font-size: 2.4rem;
+    line-height: 3rem;
   }
 
   strong,
@@ -131,8 +137,23 @@ export const contentStyle = (theme: Theme) => css`
   code {
     padding: 0.2rem 0.7rem;
     border-radius: 0.4rem;
-    background: ${theme.colors.fillLine};
+    background: ${theme.colors.bgElevated};
     color: ${theme.colors.fillSecondary};
+  }
+
+  mark {
+    padding: 0.2rem 0.7rem;
+    margin: 0 0.8rem;
+    border-radius: 0.4rem;
+    border: 2px solid ${theme.colors.fillHighlight};
+    color: ${theme.colors.fillHighlight};
+  }
+
+  blockquote {
+    margin-top: 2rem;
+    padding: 0.4rem 2.4rem;
+    background: ${theme.colors.bgElevated};
+    border-left: 4px solid ${theme.colors.fillPrimary};
   }
 
   .main-image {
@@ -141,5 +162,18 @@ export const contentStyle = (theme: Theme) => css`
     max-width: unset;
     margin-right: 0;
     padding: 0;
+  }
+
+  .twocols {
+    display: flex;
+    gap: 2rem;
+
+    & > div {
+      flex: 1 1 0;
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
   }
 `;

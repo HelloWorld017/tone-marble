@@ -43,6 +43,10 @@ export const urlStyle = (theme: Theme) => css`
   border-radius: 0.4rem;
   padding: 0.4rem 0.8rem;
   background: ${theme.colors.bgElevated};
+  font-variant-ligatures: no-contextual;
+  font-feature-settings:
+    'ss06' 1,
+    'zero' 1;
 `;
 
 export const statusStyle = (isActive: boolean) => (theme: Theme) => css`
