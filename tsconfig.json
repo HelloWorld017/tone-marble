@@ -15,8 +15,8 @@
     },
 
     // Types
-    "target": "es2022",
-    "lib": ["es2022", "dom"],
+    "target": "esnext",
+    "lib": ["esnext", "dom"],
     "types": [
       "audioworklet",
       "mdx",

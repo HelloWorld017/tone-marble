@@ -8,6 +8,8 @@ import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
 import { useAudioContext } from './AudioContextProvider';
 import { useSynthesize } from './SynthesizeProvider';
+import { createPinkNoiseBuffer } from './utils/createPinkNoiseBuffer';
+import { createReverbEffect } from './utils/createReverbEffect';
 import { createWhiteNoiseBuffer } from './utils/createWhiteNoiseBuffer';
 
 const OFF_BASE_FREQUENCY = 456;
@@ -120,7 +122,7 @@ export const [SynthesizePowerProvider, useSynthesizePower] = buildContext(() => 
     };
   });
 
-  const synthesizePowerOn = useLatestCallback(() => {
+  const synthesizePowerOnChords = useLatestCallback(() => {
     if (!ctx || !masterCompresser) {
       return;
     }
@@ -186,6 +188,119 @@ export const [SynthesizePowerProvider, useSynthesizePower] = buildContext(() => 
         }
       };
     });
+  });
+
+  const synthesizePowerOn = useLatestCallback(async () => {
+    if (!ctx || !masterCompresser) {
+      return;
+    }
+
+    const {
+      reverbIn,
+      reverbOut,
+      disconnect: disconnectReverb,
+    } = await createReverbEffect(ctx, { reverbTime: 0.1 });
+
+    const output = ctx.createGain();
+    output.connect(reverbIn);
+    reverbOut.connect(masterCompresser);
+
+    const playAudio = (buffer: AudioBuffer, t: number) => {
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(output);
+      source.start(t);
+      source.onended = () => source.disconnect();
+    };
+
+    const t = ctx.currentTime;
+    playAudio(toggleTickSoundBuffer, t);
+    playAudio(toggleTockSoundBuffer, t + 0.1);
+    playAudio(toggleTickSoundBuffer, t + 0.2);
+
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.value = 0;
+    noiseGain.gain.setValueAtTime(0, t + 0.2);
+    noiseGain.gain.linearRampToValueAtTime(1, t + 1.7);
+    noiseGain.gain.setValueAtTime(1, t + 2);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 2.4);
+    noiseGain.gain.linearRampToValueAtTime(0, t + 2.41);
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = createPinkNoiseBuffer(ctx, 3);
+
+    const lpf = ctx.createBiquadFilter();
+    lpf.type = 'lowpass';
+    lpf.Q.value = 30;
+    lpf.frequency.setValueAtTime(20, t);
+    lpf.frequency.linearRampToValueAtTime(150, t + 2.5);
+
+    const bpf = ctx.createBiquadFilter();
+    bpf.type = 'bandpass';
+    bpf.Q.value = 50;
+    bpf.frequency.setValueAtTime(2000, t);
+    bpf.frequency.linearRampToValueAtTime(2500, t + 2.5);
+
+    const bpfGain = ctx.createGain();
+    bpfGain.gain.value = 0;
+    bpfGain.gain.setValueAtTime(0.2, t);
+    bpfGain.gain.exponentialRampToValueAtTime(0.8, t + 2.5);
+
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(2000, t);
+    osc.frequency.linearRampToValueAtTime(2500, t + 2.5);
+
+    const oscGain = ctx.createGain();
+    oscGain.gain.value = 0;
+    oscGain.gain.setValueAtTime(0, t + 0.2);
+    oscGain.gain.linearRampToValueAtTime(0.01, t + 2);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, t + 2.4);
+    oscGain.gain.linearRampToValueAtTime(0, t + 2.41);
+
+    const chimeOsc = ctx.createOscillator();
+    chimeOsc.type = 'sine';
+    chimeOsc.frequency.value = 2500;
+
+    const chimeGain = ctx.createGain();
+    chimeGain.gain.value = 0;
+    chimeGain.gain.setValueAtTime(0, t + 2.09);
+    chimeGain.gain.exponentialRampToValueAtTime(1, t + 2.1);
+    chimeGain.gain.exponentialRampToValueAtTime(0.001, t + 2.49);
+    chimeGain.gain.linearRampToValueAtTime(0, t + 2.5);
+
+    osc.connect(oscGain);
+    oscGain.connect(output);
+    chimeOsc.connect(chimeGain);
+    chimeGain.connect(output);
+    noise.connect(noiseGain);
+    noiseGain.connect(lpf);
+    noiseGain.connect(bpf);
+    lpf.connect(output);
+    bpf.connect(bpfGain);
+    bpfGain.connect(output);
+
+    noise.start(t + 0.2);
+    noise.stop(t + 2.5);
+    osc.start(t + 0.2);
+    osc.stop(t + 2.5);
+    chimeOsc.start(t + 2.1);
+    chimeOsc.stop(t + 2.5);
+    chimeOsc.onended = () => {
+      disconnectReverb();
+      osc.disconnect();
+      oscGain.disconnect();
+      chimeOsc.disconnect();
+      chimeGain.disconnect();
+      noise.disconnect();
+      noiseGain.disconnect();
+      lpf.disconnect();
+      bpf.disconnect();
+      bpfGain.disconnect();
+      output.disconnect();
+    };
+
+    synthesizePowerOnChords();
   });
 
   return {
