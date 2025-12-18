@@ -1,8 +1,5 @@
-import ToggleTickSound from '@/assets/audio/toggle-tick.mp3';
-import ToggleTockSound from '@/assets/audio/toggle-tock.mp3';
 import { createPinkNoiseBuffer } from '@/components/audio/utils/createPinkNoiseBuffer';
 import { createReverbEffect } from '@/components/audio/utils/createReverbEffect';
-import { createWhiteNoiseBuffer } from '@/components/audio/utils/createWhiteNoiseBuffer';
 
 declare global {
   interface Window {
@@ -14,11 +11,6 @@ declare global {
 window.synth = async () => {
   const ctx = new AudioContext();
 
-  const fetchAudio = async (url: string): Promise<AudioBuffer> => {
-    const data = await fetch(url).then(res => res.arrayBuffer());
-    return ctx.decodeAudioData(data);
-  };
-
   const {
     reverbIn,
     reverbOut,
@@ -29,23 +21,7 @@ window.synth = async () => {
   output.connect(reverbIn);
   reverbOut.connect(ctx.destination);
 
-  const [tick, tock] = await Promise.all([
-    fetchAudio(ToggleTickSound),
-    fetchAudio(ToggleTockSound),
-  ]);
-
-  const playAudio = (buffer: AudioBuffer, t: number) => {
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(output);
-    source.start(t);
-    source.onended = () => source.disconnect();
-  };
-
   const t = ctx.currentTime;
-  playAudio(tick, t);
-  playAudio(tock, t + 0.1);
-  playAudio(tick, t + 0.2);
 
   const noiseGain = ctx.createGain();
   noiseGain.gain.value = 0;
