@@ -1,4 +1,7 @@
-export const createWhiteNoiseBuffer = (ctx: AudioContext, length = 2): AudioBuffer => {
+export const createWhiteNoiseBuffer = (
+  ctx: AudioContext | OfflineAudioContext,
+  length = 2
+): AudioBuffer => {
   const bufferSize = Math.ceil(ctx.sampleRate * length);
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
   const data = buffer.getChannelData(0);

@@ -2,10 +2,12 @@ import ToggleTickSound from '@/assets/audio/toggle-tick.mp3';
 import ToggleTockSound from '@/assets/audio/toggle-tock.mp3';
 import { createPinkNoiseBuffer } from '@/components/audio/utils/createPinkNoiseBuffer';
 import { createReverbEffect } from '@/components/audio/utils/createReverbEffect';
+import { createWhiteNoiseBuffer } from '@/components/audio/utils/createWhiteNoiseBuffer';
 
 declare global {
   interface Window {
     synth?(): void;
+    synthClick?(): void;
   }
 }
 
@@ -126,4 +128,49 @@ window.synth = async () => {
     bpfGain.disconnect();
     output.disconnect();
   };
+};
+
+window.synthClick = (frequency = 500) => {
+  const ctx = new AudioContext();
+  const t = ctx.currentTime;
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = createPinkNoiseBuffer(ctx);
+
+  const oscLow = ctx.createOscillator();
+  oscLow.type = 'sawtooth';
+  oscLow.frequency.setValueAtTime(frequency / 13.98, t);
+  oscLow.frequency.exponentialRampToValueAtTime(frequency / 25.74, t + 0.03);
+
+  const osc = ctx.createOscillator();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(frequency, t);
+  osc.frequency.exponentialRampToValueAtTime(frequency / 2, t + 0.03);
+
+  const oscGain = ctx.createGain();
+  oscGain.gain.setValueAtTime(0, t);
+  oscGain.gain.exponentialRampToValueAtTime(0.5, t + 0.01);
+  oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'highpass';
+  filter.frequency.value = 1000;
+  filter.frequency.exponentialRampToValueAtTime(500, t + 0.03);
+
+  const noiseGain = ctx.createGain();
+  noiseGain.gain.setValueAtTime(0, t);
+  noiseGain.gain.exponentialRampToValueAtTime(0.7, t + 0.005);
+  noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 0.03);
+
+  osc.connect(oscGain);
+  oscLow.connect(oscGain);
+  noise.connect(filter);
+  filter.connect(noiseGain);
+  noiseGain.connect(ctx.destination);
+  oscGain.connect(ctx.destination);
+
+  osc.start();
+  noise.start();
+  osc.stop(ctx.currentTime + 0.05);
+  noise.stop(ctx.currentTime + 0.05);
 };

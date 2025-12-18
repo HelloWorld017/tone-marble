@@ -19,7 +19,11 @@ export const CasePower = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
   useEffect(() => setIsPoweredOnInternal(isPoweredOn), [isPoweredOn]);
   useEffect(() => {
     if (isPoweredOnInternal !== isPoweredOn) {
-      const timeoutId = setTimeout(() => setIsPoweredOn(isPoweredOnInternal), 1000);
+      const timeoutId = setTimeout(
+        () => setIsPoweredOn(isPoweredOnInternal),
+        isPoweredOnInternal ? 550 : 1000
+      );
+
       return () => clearTimeout(timeoutId);
     }
   }, [isPoweredOn, isPoweredOnInternal]);
@@ -28,14 +32,14 @@ export const CasePower = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
   const synthesizePowerOff = useSynthesizePower(state => state.synthesizePowerOff);
   const togglePowerUpDown = useLatestCallback(() => {
     if (!isPoweredOnInternal) {
-      synthesizePowerOn();
+      synthesizePowerOn().catch(() => {});
     } else {
       synthesizePowerOff();
     }
 
     setTimeout(
       () => setIsPoweredOnInternal(!isPoweredOnInternal),
-      !isPoweredOnInternal ? 300 : 1000
+      !isPoweredOnInternal ? 100 : 1000
     );
   });
 

@@ -68,20 +68,19 @@ export const [SynthesizeMarbleProvider, useSynthesizeMarble] = buildContext(() =
     }
 
     const t = ctx.currentTime;
+
     const osc = ctx.createOscillator();
-    const envelope = ctx.createGain();
-    const panner = ctx.createPanner();
-
-    const frequency = getRandomFrequency(readPitch());
     osc.type = 'sine';
-    osc.frequency.value = frequency;
+    osc.frequency.value = getRandomFrequency(readPitch());
 
+    const envelope = ctx.createGain();
     const attack = 0.01;
     const decay = 0.1 + gain * 0.2;
     envelope.gain.setValueAtTime(0, t);
     envelope.gain.linearRampToValueAtTime(Math.min(1, gain * 3), t + attack);
     envelope.gain.exponentialRampToValueAtTime(0.001, t + attack + decay);
 
+    const panner = ctx.createPanner();
     updatePannerForPosition(panner, position);
 
     osc.connect(envelope);
@@ -111,27 +110,26 @@ export const [SynthesizeMarbleProvider, useSynthesizeMarble] = buildContext(() =
     }
 
     const t = ctx.currentTime;
-    const source = ctx.createBufferSource();
-    const filter = ctx.createBiquadFilter();
-    const envelope = ctx.createGain();
-    const panner = ctx.createPanner();
 
+    const source = ctx.createBufferSource();
     source.buffer = whiteNoise;
     source.loop = true;
     source.loopStart = Math.random() * (WHITENOISE_BUFFER_SIZE - 0.5);
     source.loopEnd = source.loopStart + 0.5;
 
-    const frequency = getRandomFrequency(readPitch());
+    const filter = ctx.createBiquadFilter();
     filter.type = 'bandpass';
-    filter.frequency.value = frequency;
+    filter.frequency.value = getRandomFrequency(readPitch());
     filter.Q.value = 0.5 + Math.random() * 0.5;
 
+    const envelope = ctx.createGain();
     const attack = 0.05 + Math.random() * 0.05;
     const decay = 0.2 + gain * 0.5;
     envelope.gain.setValueAtTime(0, t);
     envelope.gain.linearRampToValueAtTime(gain * 0.15, t + attack);
     envelope.gain.linearRampToValueAtTime(0, t + attack + decay);
 
+    const panner = ctx.createPanner();
     updatePannerForPosition(panner, position);
 
     source.connect(filter);

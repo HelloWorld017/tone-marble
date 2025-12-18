@@ -6,7 +6,6 @@ import { useAudioContext } from './AudioContextProvider';
 import { useConnectNodeChain } from './hooks/useConnectNode';
 import { useDynamicsCompressor } from './hooks/useDynamicsCompressor';
 import { useGain } from './hooks/useGain';
-import { updatePannerForPosition } from './utils/updatePannerForPosition';
 import type { Position } from '@/types/Position';
 
 export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
@@ -54,34 +53,6 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
     ctx.listener.positionZ.value = position[2];
   });
 
-  const playAudio = useLatestCallback((audio: AudioBuffer, position?: Position) => {
-    if (!ctx || !masterCompressor) {
-      return;
-    }
-
-    const t = ctx.currentTime;
-    const source = ctx.createBufferSource();
-    let target: AudioNode = masterCompressor;
-
-    if (position) {
-      const panner = ctx.createPanner();
-      updatePannerForPosition(panner, position);
-      panner.connect(target);
-      target = panner;
-    }
-
-    source.buffer = audio;
-    source.connect(target);
-
-    source.start(t);
-    source.onended = () => {
-      source.disconnect();
-      if (position) {
-        target.disconnect();
-      }
-    };
-  });
-
   const calculateEffectiveGain = useLatestCallback((gain: number, origin: Position) => {
     const listener = listenerPosition.current;
     const distance = Math.hypot(
@@ -96,10 +67,9 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(() => {
   return {
     analyzerOut,
     destinationOut,
-    masterCompressor,
+    masterOut: masterCompressor,
     updateListenerPosition,
     calculateEffectiveGain,
-    playAudio,
     addEffect,
   };
 });

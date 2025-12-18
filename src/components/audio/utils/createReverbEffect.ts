@@ -12,7 +12,7 @@ export const createReverbEffect = async (
   envelope.gain.linearRampToValueAtTime(0, t + reverbTime / 3);
 
   const osc = rctx.createBufferSource();
-  osc.buffer = createWhiteNoiseBuffer(rctx as unknown as AudioContext, 1);
+  osc.buffer = createWhiteNoiseBuffer(rctx, 1);
   osc.connect(envelope);
 
   const lpf = rctx.createBiquadFilter();

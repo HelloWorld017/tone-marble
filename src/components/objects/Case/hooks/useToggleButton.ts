@@ -1,11 +1,8 @@
 import { useSpring } from '@react-spring/three';
-import { useLoader } from '@react-three/fiber';
 import { useMemo, useState } from 'react';
-import { AudioLoader, type Object3D } from 'three';
-import ToggleTickSound from '@/assets/audio/toggle-tick.mp3';
-import ToggleTockSound from '@/assets/audio/toggle-tock.mp3';
-import { useSynthesize } from '@/components/audio/SynthesizeProvider';
+import { useSynthesizeButton } from '@/components/audio/SynthesizeButtonProvider';
 import { useHover } from './useHover';
+import type { Object3D } from 'three';
 
 type UseToggleButtonProps = {
   bone: Object3D;
@@ -22,15 +19,14 @@ export const useToggleButton = ({
   baseZ = 0,
   toggleByBone = false,
 }: UseToggleButtonProps) => {
-  const playAudio = useSynthesize(state => state.playAudio);
-  const toggleTickSoundBuffer = useLoader(AudioLoader, ToggleTickSound);
-  const toggleTockSoundBuffer = useLoader(AudioLoader, ToggleTockSound);
+  const synthesizeTick = useSynthesizeButton(state => state.synthesizeTick);
+  const synthesizeTock = useSynthesizeButton(state => state.synthesizeTock);
 
   const { isActive, groupProps } = useHover({
-    onPointerDown: () => playAudio(toggleTickSoundBuffer, bone.position.toArray()),
+    onPointerDown: () => synthesizeTick({ position: bone.position.toArray(), gain: 2 }),
     onPointerUpActive: () => {
       onChange(!state);
-      playAudio(toggleTockSoundBuffer, bone.position.toArray());
+      synthesizeTock({ position: bone.position.toArray(), gain: 2 });
     },
   });
 
@@ -59,6 +55,3 @@ export const useToggleButton = ({
     lightIntensity,
   };
 };
-
-useLoader.preload(AudioLoader, ToggleTickSound);
-useLoader.preload(AudioLoader, ToggleTockSound);

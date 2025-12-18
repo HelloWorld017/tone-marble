@@ -2,7 +2,10 @@
 // > Algorithm from:
 // > https://www.musicdsp.org/en/latest/Filters/76-pink-noise-filter.html
 
-export const createPinkNoiseBuffer = (ctx: AudioContext, length = 2): AudioBuffer => {
+export const createPinkNoiseBuffer = (
+  ctx: AudioContext | OfflineAudioContext,
+  length = 2
+): AudioBuffer => {
   const bufferSize = Math.ceil(ctx.sampleRate * length);
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
   const data = buffer.getChannelData(0);
