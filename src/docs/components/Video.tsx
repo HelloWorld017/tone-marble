@@ -1,25 +1,33 @@
+import { animated, useSpringValue } from '@react-spring/web';
 import { throttle } from 'es-toolkit';
-import { Play, Pause } from 'lucide-react';
-import { useState, useRef, useMemo, useEffect } from 'react';
-import { IconPause, IconPlay } from '@/assets/icons/lucide';
+import { useState, useRef, useMemo } from 'react';
+import { IconPause, IconPlay, IconVolume2, IconVolumeX } from '@/assets/icons/lucide';
+import { useLatestRef } from '@/hooks/useLatestRef';
 import * as styles from './Video.css';
+import type { AnimatedSimple } from '@/types/AnimatedSimple';
 
+const a = animated as unknown as AnimatedSimple;
 export const Video = ({ src, thumbnail }: { src: string; thumbnail: string }) => {
-  const [isInitial, setIsInitial] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
   const [duration, setDuration] = useState(0);
+  const durationRef = useLatestRef(duration);
+
   const [progress, setProgress] = useState(0);
-  const setProgressThrottled = useMemo(() => throttle(setProgress, 150), []);
+  const progressSpring = useSpringValue(0);
+  const setProgressThrottled = useMemo(
+    () =>
+      throttle((value: number) => {
+        setProgress(value);
+        void progressSpring.start((value / durationRef.current) * 100);
+      }, 150),
+    []
+  );
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const labelRef = useRef<HTMLLabelElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    if (isPlaying) {
-      setIsInitial(false);
-    }
-  }, [isPlaying]);
 
   const onPlayPause = (nextIsPlaying: boolean) => {
     void videoRef.current?.[nextIsPlaying ? 'play' : 'pause']();
@@ -59,6 +67,7 @@ export const Video = ({ src, thumbnail }: { src: string; thumbnail: string }) =>
         onLoadedMetadata={() => videoRef.current && setDuration(videoRef.current.duration)}
         onTimeUpdate={() => videoRef.current && setProgressThrottled(videoRef.current.currentTime)}
         onClick={() => onPlayPause(!isPlaying)}
+        muted={isMuted}
       >
         <source src={src} type="video/mp4" />
       </video>
@@ -67,7 +76,7 @@ export const Video = ({ src, thumbnail }: { src: string; thumbnail: string }) =>
         <IconPlay fill="currentColor" />
       </button>
 
-      <div css={styles.overlayStyle(isInitial)}>
+      <div css={styles.overlayStyle}>
         <div css={styles.controlRowStyle}>
           <button css={styles.iconButtonStyle} onClick={() => onPlayPause(!isPlaying)}>
             {isPlaying ? <IconPause strokeWidth={1.5} /> : <IconPlay strokeWidth={1.5} />}
@@ -75,13 +84,14 @@ export const Video = ({ src, thumbnail }: { src: string; thumbnail: string }) =>
 
           <span css={styles.progressStyle}>
             <span>{formatTimestamp(progress)}</span>
+            <span>/</span>
             <span>{formatTimestamp(duration)}</span>
           </span>
 
-          <label
+          <a.label
             css={styles.rangeStyle}
             ref={labelRef}
-            style={{ '--progress': `${(progress / duration) * 100}%` }}
+            style={{ '--progress': progressSpring.to(value => `${value}%`) }}
           >
             <span css={styles.rangeTrackStyle} />
             <input
@@ -93,7 +103,11 @@ export const Video = ({ src, thumbnail }: { src: string; thumbnail: string }) =>
               max={duration}
               onChange={e => onSliderChange(e.currentTarget.valueAsNumber)}
             />
-          </label>
+          </a.label>
+
+          <button css={styles.iconButtonStyle} onClick={() => setIsMuted(!isMuted)}>
+            {isMuted ? <IconVolumeX strokeWidth={1.5} /> : <IconVolume2 strokeWidth={1.5} />}
+          </button>
         </div>
       </div>
     </div>

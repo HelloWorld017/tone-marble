@@ -47,7 +47,7 @@ export const playButtonStyle = (isPlaying: boolean) => (theme: Theme) => css`
   }
 `;
 
-export const overlayStyle = (isInitial: boolean) => (theme: Theme) => css`
+export const overlayStyle = (theme: Theme) => css`
   position: absolute;
   bottom: 0;
   left: 0;
@@ -66,13 +66,10 @@ export const overlayStyle = (isInitial: boolean) => (theme: Theme) => css`
     transform ${theme.easings.default};
   transform: translateY(10px);
 
-  ${!isInitial &&
-  css`
-    *:hover > & {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  `};
+  *:hover > & {
+    opacity: 1;
+    transform: translateY(0);
+  }
 `;
 
 export const controlRowStyle = css`
@@ -89,8 +86,8 @@ export const iconButtonStyle = (theme: Theme) => css`
   align-items: center;
   justify-content: center;
 
-  padding: 1.2rem;
-  margin: -0.4rem -0.8rem;
+  padding: 0.8rem;
+  margin: 0 -0.4rem;
   background: transparent;
   font-size: 2rem;
   color: #ffffff;
@@ -133,6 +130,7 @@ export const rangeTrackStyle = (theme: Theme) => css`
   height: 0.8rem;
   border-radius: 0.8rem;
   background: ${theme.colors.fillLine};
+  overflow: hidden;
 
   &::before {
     content: '';
