@@ -1,7 +1,7 @@
 import { animated, useSpring } from '@react-spring/three';
 import { throttle } from 'es-toolkit';
 import { useEffect, useMemo, useState } from 'react';
-import { useSynthesizePower } from '@/components/audio/SynthesizePowerProvider';
+import { useSynthesizeSFX } from '@/components/audio/SynthesizeSFXProvider';
 import { useInterfaceState } from '@/components/providers/InterfaceStateProvider';
 import { DEG2RAD } from '@/constants';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
@@ -28,8 +28,8 @@ export const CasePower = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
     }
   }, [isPoweredOn, isPoweredOnInternal]);
 
-  const synthesizePowerOn = useSynthesizePower(state => state.synthesizePowerOn);
-  const synthesizePowerOff = useSynthesizePower(state => state.synthesizePowerOff);
+  const synthesizePowerOn = useSynthesizeSFX(state => state.synthesizePowerOn);
+  const synthesizePowerOff = useSynthesizeSFX(state => state.synthesizePowerOff);
   const togglePowerUpDown = useLatestCallback(() => {
     if (!isPoweredOnInternal) {
       synthesizePowerOn().catch(() => {});
@@ -43,7 +43,7 @@ export const CasePower = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
     );
   });
 
-  const togglePowerUpDownThrottled = useMemo(() => throttle(togglePowerUpDown, 3000), []);
+  const togglePowerUpDownThrottled = useMemo(() => throttle(togglePowerUpDown, 4000), []);
   const { groupProps } = useHover({
     onPointerUpActive: togglePowerUpDownThrottled,
   });

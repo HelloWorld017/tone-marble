@@ -4,12 +4,14 @@ import { useCreateSignal, useSignal } from '@/hooks/useSignal';
 import type { Signal } from '@/hooks/useSignal';
 import type { ReactNode } from 'react';
 
-export const buildContext = <T,>(useContextValue: () => T) => {
+export const buildContext = <T, TProps = Record<string, unknown>>(
+  useContextValue: (props: TProps) => T
+) => {
   const Context = createContext<Signal<T>>(null as never);
-  const Provider = ({ children }: { children: ReactNode }) => {
-    const contextValue = useContextValue();
+  const Provider = (props: { children: ReactNode } & TProps) => {
+    const contextValue = useContextValue(props);
     const contextSignal = useCreateSignal(contextValue);
-    return <Context value={contextSignal}>{children}</Context>;
+    return <Context value={contextSignal}>{props.children}</Context>;
   };
 
   Provider.displayName = `${useContextValue.name?.slice(4) ?? ''}Provider`;

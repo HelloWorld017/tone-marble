@@ -1,6 +1,6 @@
 import { useSpring } from '@react-spring/three';
 import { useMemo, useState } from 'react';
-import { useSynthesizeButton } from '@/components/audio/SynthesizeButtonProvider';
+import { useSynthesizeSFX } from '@/components/audio/SynthesizeSFXProvider';
 import { useHover } from './useHover';
 import type { Object3D } from 'three';
 
@@ -19,8 +19,8 @@ export const useToggleButton = ({
   baseZ = 0,
   toggleByBone = false,
 }: UseToggleButtonProps) => {
-  const synthesizeTick = useSynthesizeButton(state => state.synthesizeTick);
-  const synthesizeTock = useSynthesizeButton(state => state.synthesizeTock);
+  const synthesizeTick = useSynthesizeSFX(state => state.synthesizeTick);
+  const synthesizeTock = useSynthesizeSFX(state => state.synthesizeTock);
 
   const { isActive, groupProps } = useHover({
     onPointerDown: () => synthesizeTick({ position: bone.position.toArray(), gain: 2 }),

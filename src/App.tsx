@@ -5,18 +5,25 @@ import {
   AudioContextProvider,
 } from './components/audio/AudioContextProvider';
 import { ChromaDetector } from './components/audio/ChromaDetector';
-import { SynthesizeButtonProvider } from './components/audio/SynthesizeButtonProvider';
 import { SynthesizeMarbleProvider } from './components/audio/SynthesizeMarbleProvider';
-import { SynthesizePowerProvider } from './components/audio/SynthesizePowerProvider';
 import { SynthesizeProvider } from './components/audio/SynthesizeProvider';
 import { SynthesizeRhythm } from './components/audio/SynthesizeRhythm';
+import { SynthesizeSFXProvider } from './components/audio/SynthesizeSFXProvider';
 import { ControllerProvider } from './components/providers/ControllerProvider';
-import { InterfaceStateProvider } from './components/providers/InterfaceStateProvider';
+import {
+  InterfaceStateProvider,
+  useInterfaceState,
+} from './components/providers/InterfaceStateProvider';
 import { PitchMapProvider } from './components/providers/PitchMapProvider';
 import { Sidebar } from './components/ui/Sidebar';
 import { DEFAULT_THEME } from './constants/theme';
 import { globalStyle } from './utils/css/global';
 import type { ReactNode } from 'react';
+
+const AppSynthesizeProvider = ({ children }: { children: ReactNode }) => {
+  const additionalGain = useInterfaceState(state => state.additionalGain);
+  return <SynthesizeProvider gain={additionalGain}>{children}</SynthesizeProvider>;
+};
 
 const AppProviders = ({ children }: { children: ReactNode }) => (
   <ThemeProvider theme={DEFAULT_THEME}>
@@ -27,22 +34,21 @@ const AppProviders = ({ children }: { children: ReactNode }) => (
         <InterfaceStateProvider>
           <PitchMapProvider>
             <ChromaDetector />
-            <SynthesizeProvider>
-              <SynthesizeButtonProvider>
+            <AppSynthesizeProvider>
+              <SynthesizeSFXProvider>
                 <SynthesizeMarbleProvider>
-                  <SynthesizePowerProvider>
-                    <SynthesizeRhythm />
-                    {children}
-                  </SynthesizePowerProvider>
+                  <SynthesizeRhythm />
+                  {children}
                 </SynthesizeMarbleProvider>
-              </SynthesizeButtonProvider>
-            </SynthesizeProvider>
+              </SynthesizeSFXProvider>
+            </AppSynthesizeProvider>
           </PitchMapProvider>
         </InterfaceStateProvider>
       </ControllerProvider>
     </AudioContextProvider>
   </ThemeProvider>
 );
+
 export const App = () => (
   <AppProviders>
     <Scene />
