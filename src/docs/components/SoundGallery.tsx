@@ -1,5 +1,6 @@
 import { animated } from '@react-spring/web';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { IconPause } from '@/assets/icons/lucide';
 import {
   useAudioContext,
   useInitializeAudioContext,
@@ -81,7 +82,7 @@ export const SoundGallery = () => {
 
     const onChangeChroma = () => {
       currentChroma = Math.floor(Math.random() * 12);
-      chromaTimeoutId = setTimeout(onChangeChroma, 2000);
+      chromaTimeoutId = setTimeout(onChangeChroma, 4000);
     };
 
     onChangeChroma();
@@ -116,7 +117,7 @@ export const SoundGallery = () => {
     }
 
     if (playingSound === 'power-off') {
-      const stopTimeout = setTimeout(() => setPlaingSound(null), 5000);
+      const stopTimeout = setTimeout(() => setPlaingSound(null), 3500);
       const powerOffGain = ctx.createGain();
       powerOffGain.connect(masterOut);
       synthSFX.synthesizePowerOff({ destination: powerOffGain });
@@ -198,26 +199,39 @@ export const SoundGallery = () => {
     [toggleSound]
   );
 
-  const { containerRef, getStyle } = usePiledScroll({
+  const { containerRef, gestureRef, getStyle } = usePiledScroll({
     itemCount: items.length,
     itemWidth: 200,
     gap: 5,
   });
 
   return (
-    <div css={styles.preventOverflowStyle}>
-      <section>
-        <div css={styles.galleryStyle} ref={containerRef}>
-          {items.map(({ kind, cover }, index) => (
-            <a.button key={kind} style={getStyle(index)} onClick={toggleSound(kind)} type="button">
-              <img
-                src={cover}
-                alt={kind.replace(/(?:^|-)([a-z])/g, (_, c: string) => c.toUpperCase())}
-              />
-            </a.button>
-          ))}
-        </div>
-      </section>
+    <div css={styles.rootStyle}>
+      <div css={styles.galleryWrapperStyle}>
+        <section css={styles.gallerySectionStyle}>
+          <div css={styles.galleryContainerStyle} ref={gestureRef}>
+            <div css={styles.galleryStyle} ref={containerRef}>
+              {items.map(({ kind, cover }, index) => (
+                <a.button
+                  key={kind}
+                  css={styles.buttonStyle}
+                  style={getStyle(index)}
+                  onClick={toggleSound(kind)}
+                  type="button"
+                >
+                  <img
+                    src={cover}
+                    alt={kind.replace(/(?:^|-)([a-z])/g, (_, c: string) => c.toUpperCase())}
+                  />
+                  <div css={styles.buttonPauseStyle(playingSound === kind)}>
+                    <IconPause strokeWidth={1} />
+                  </div>
+                </a.button>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 };

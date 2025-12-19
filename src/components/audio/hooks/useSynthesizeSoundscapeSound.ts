@@ -134,7 +134,7 @@ export const useSynthesizeSoundscapeSound = () => {
 
   const isUpBeatRef = useRef(false);
   const synthesizeRhythm = useLatestCallback(() => {
-    if (isUpBeatRef.current) {
+    if (!isUpBeatRef.current) {
       synthesizeKick();
     }
 

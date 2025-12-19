@@ -39,21 +39,11 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(
     const destinationOut = useGain({ gain: 1 }, masterCompressor);
     const analyzerOut = useGain({ gain: 1 }, null);
 
-    const updateListenerPosition = useLatestCallback((position: Position) => {
-      if (!ctx) {
-        return;
-      }
-
-      ctx.listener.positionX.value = position[0];
-      ctx.listener.positionY.value = position[1];
-      ctx.listener.positionZ.value = position[2];
-    });
-
     const calculateEffectiveGain = useLatestCallback((gain: number, origin: Position) => {
       const distance = Math.hypot(
-        origin[0] - (ctx?.listener.positionX.value ?? 0),
-        origin[1] - (ctx?.listener.positionY.value ?? 0),
-        origin[2] - (ctx?.listener.positionZ.value ?? 0)
+        origin[0] - (ctx?.listener.positionX?.value ?? 0),
+        origin[1] - (ctx?.listener.positionY?.value ?? 0),
+        origin[2] - (ctx?.listener.positionZ?.value ?? 0)
       );
       const attenuation = 1 / (1 + distance);
       return gain * attenuation;
@@ -63,7 +53,6 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(
       analyzerOut,
       destinationOut,
       masterOut: masterCompressor,
-      updateListenerPosition,
       calculateEffectiveGain,
       addEffect,
     };

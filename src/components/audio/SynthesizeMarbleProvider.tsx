@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
 import { useInterfaceState } from '../providers/InterfaceStateProvider';
@@ -19,12 +18,16 @@ const shouldPlay = (activeVoices: number, effectiveGain: number) => {
     return false;
   }
 
-  if (activeVoices > 80) {
+  if (activeVoices > MAX_VOICES * 0.8) {
     return effectiveGain >= 0.15;
   }
 
-  if (activeVoices >= 50) {
+  if (activeVoices >= MAX_VOICES * 0.7) {
     return effectiveGain >= 0.05;
+  }
+
+  if (activeVoices >= MAX_VOICES * 0.5) {
+    return effectiveGain >= 0.025;
   }
 
   return effectiveGain >= 0.001;
@@ -37,13 +40,14 @@ const shouldPlay = (activeVoices: number, effectiveGain: number) => {
 export const [SynthesizeMarbleProvider, useSynthesizeMarble] = buildContext(() => {
   const calculateEffectiveGain = useSynthesize(state => state.calculateEffectiveGain);
 
-  const activeVoices = useRef(0);
   const readPitch = usePitchMap(state => state.readPitch);
 
   const sandActivePillars = useInterfaceState(state => state.sandActivePillars);
   const glassActivePillars = useInterfaceState(state => state.glassActivePillars);
   const windActivePillars = useInterfaceState(state => state.windActivePillars);
-  const { synthesizeSand, synthesizeWind, synthesizeGlass } = useSynthesizeMarbleSound();
+  const { activeVoices, synthesizeSand, synthesizeWind, synthesizeGlass } =
+    useSynthesizeMarbleSound();
+
   const synthesize = useLatestCallback((row: number, position: Position, gain: number) => {
     const effectiveGain = calculateEffectiveGain(gain, position);
     if (!shouldPlay(activeVoices.current, effectiveGain)) {

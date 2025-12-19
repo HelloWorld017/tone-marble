@@ -1,11 +1,13 @@
 import ImageToneMarbleMain from './assets/images/tone-marble-main.webp';
 import ImageTM07Structure from './assets/images/tm07-structure.png';
+import VideoDemo from './assets/videos/tonemarble-demo.mp4';
 import { CirclesPanout } from './components/CirclesPanout';
 import { Footer } from './components/Footer';
 import { FullWidthImage } from './components/FullWidthImage';
 import { SiriWave } from './components/SiriWave';
 import { SoundGallery } from './components/SoundGallery';
 import { MotivationImages } from './components/MotivationImages'
+import { Video } from './components/Video';
 
 <section>
   # TM-07 <span>: An unrealistic instrument</span>
@@ -17,7 +19,7 @@ import { MotivationImages } from './components/MotivationImages'
   ## <i>01</i> A Modern Artifact <span>_ Precision engineering meets organic tranquility</span>
 
   The TM-07, while being an instrument, is a piece of desk sculpture designed to inspire.  
-  The design language strips away the unnecessary, leaving only a sleek, pocketable form factor that bridges the gap between a high-fidelity audio tool and a modernist art object.  
+  The design language strips away the unnecessary, leaving only a sleek form factor that bridges the gap between a high-fidelity audio tool and a modernist art object.  
   It looks as beautiful silent as it sounds when active.
 </section>
 
@@ -26,9 +28,9 @@ import { MotivationImages } from './components/MotivationImages'
 
 <section>
   ## <i>02</i> Kinetic Synthesis Engine <span>_ The physics of sound, visualized and heard.</span>
-  At the heart of the Tone-Marble is a gravity-defying physics engine.
+  The heart of the Tone-Marble is a gravity-defying physics engine.
   Tilt your mobile device to release a cascade of virtual marbles.
-  As they collide with digital internal pillars, they trigger a generative soundscape based on three elemental textures: Wind, Glass, and Sand.  
+  As they collide with internal pillars, they trigger a generative soundscape based on three elemental textures: Wind, Glass, and Sand.  
   Your rhythms evolve with the angle of your hand.
 </section>
 
@@ -109,12 +111,20 @@ Time flows when the marbles collide, and the speed of that flow determines the b
 You can customize the timbre assigned to each pillar and adjust the intensity of the resulting background noise.
 
 ### Sound Gallery
-Sounds used in this project are all synthesized using WebAudio and no audio clips are used.  
-You can hear some of them here:
+All sounds in this project are synthesized in real-time, from scratch, using the Web Audio API.  
+You can preview them below:
 
 </section>
 <SoundGallery />
 <section>
+
+### Play / Demo Video
+Why don't you experience it firsthand?  
+<Video src={VideoDemo} />
+<a className="cta" href="../">Try it now</a>  
+<br />
+<br />
+<br />
 
 ### Technical Details
 The TM-07 consists of five layers:
@@ -129,7 +139,7 @@ The TM-07 consists of five layers:
   Three synthesizers implemented in WebAudio: `Wind`, `Glass` and `Sand`.
   These utilize additive & subtractive synthesis.  
   Synthesizers for `Lo-Fi Vinyl Scratch`, `Kick & Hi-hat`, and `Power Turn On/Off` are also implemented.
-  No audio clips are used in this project.
+  Actually, no pre-recorded samples are used in this project.
 
 * **Controller Layer**  
   Smartphone's motion data is sent directly to the laptop via WebRTC.
@@ -164,13 +174,11 @@ This project took 7 happy days and 3 crunch days.
   </div>
 </div>
 
-### Aesthetics / Fun / Attractive Aspects
-Why don't you experience it firsthand?
-
-<a className="cta" href="../">Try it now</a>  
-<a className="cta secondary" href="https://github.com/HelloWorld017/tone-marble">Source Code</a>  
-
 <br />
+
+### Source Code
+You can find the source code here:  
+<a className="cta secondary" href="https://github.com/HelloWorld017/tone-marble" target="_blank">Source Code</a>  
 
 </section>
 

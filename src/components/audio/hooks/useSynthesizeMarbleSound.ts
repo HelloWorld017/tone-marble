@@ -155,6 +155,7 @@ export const useSynthesizeMarbleSound = () => {
   });
 
   return {
+    activeVoices,
     synthesizeSand,
     synthesizeWind,
     synthesizeGlass,

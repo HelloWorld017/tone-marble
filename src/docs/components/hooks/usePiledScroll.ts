@@ -5,6 +5,8 @@ import { useState, useMemo, useRef, useEffect, useLayoutEffect } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import type { RefObject } from 'react';
 
+const Z_OFFSET = 50;
+
 const useGesture = createUseGesture([dragAction, wheelAction]);
 const useContainerWidth = (containerRef: RefObject<HTMLDivElement | null>) => {
   const [containerWidth, setContainerWidth] = useState(0);
@@ -46,7 +48,8 @@ export const usePiledScroll = ({ itemCount, itemWidth, gap }: UsePiledScrollProp
   const inertia = useSpringValue(0);
   const resetXDebounced = useMemo(() => debounce(() => inertia.start(0), 500), []);
 
-  useGesture(
+  const gestureRef = useRef<HTMLDivElement>(null);
+  const bind = useGesture(
     {
       onDrag: ({ offset: [offsetX], velocity: [velocityX], active }) => {
         void x.start(-offsetX, { immediate: active });
@@ -63,7 +66,7 @@ export const usePiledScroll = ({ itemCount, itemWidth, gap }: UsePiledScrollProp
       },
     },
     {
-      target: containerRef,
+      target: gestureRef,
       drag: {
         from: () => [-x.get(), 0],
         bounds: { left: -maxScroll, right: 0 },
@@ -109,7 +112,7 @@ export const usePiledScroll = ({ itemCount, itemWidth, gap }: UsePiledScrollProp
       const inertiaRotation = currentInertia * (1 - pileFactor);
       const baseRotation = pileDeltaX * 0.05;
       return (
-        `translate3d(${(pileDeltaX - currentX).toFixed(2)}px, 0, ${pileDeltaZ.toFixed(2)}px) ` +
+        `translate3d(${(pileDeltaX - currentX).toFixed(2)}px, 0, ${(pileDeltaZ + Z_OFFSET).toFixed(2)}px) ` +
         `rotateY(${(baseRotation + inertiaRotation).toFixed(2)}deg)`
       );
     });
@@ -128,10 +131,12 @@ export const usePiledScroll = ({ itemCount, itemWidth, gap }: UsePiledScrollProp
     }
 
     container.style.gap = `${gap}px`;
+    container.style.transform = `translateZ(${Z_OFFSET}px) perspective(500px) translateZ(-${Z_OFFSET}px)`;
     return () => {
       container.style.gap = '';
+      container.style.transform = '';
     };
   }, [gap]);
 
-  return { containerRef, getStyle };
+  return { containerRef, gestureRef, getStyle };
 };

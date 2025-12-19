@@ -97,7 +97,7 @@ export const Pillars = ({
 
     advancePointer();
 
-    const positionTuple = [position.x, position.y, position.z] as Position;
+    const positionTuple: Position = [position.x, position.y, position.z];
     const gain = Math.max(0, Math.min(1, event.maxForceMagnitude / MAX_COLLISION_FORCE));
     const rowParsed = parseInt(event.target.colliderObject?.name.split(';')[0] ?? '', 10);
     const row = isFinite(rowParsed) ? rowParsed : -1;

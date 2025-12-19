@@ -6,7 +6,9 @@ import {
   FileTextIcon,
   Gamepad2Icon,
   Link2OffIcon,
+  PauseIcon,
   PercentIcon,
+  PlayIcon,
   SmartphoneIcon,
   TriangleAlertIcon,
   XIcon,
@@ -27,7 +29,9 @@ export const IconCog = wrapLucideComponent(CogIcon);
 export const IconFileText = wrapLucideComponent(FileTextIcon);
 export const IconGamepad = wrapLucideComponent(Gamepad2Icon);
 export const IconLinkOff = wrapLucideComponent(Link2OffIcon);
+export const IconPause = wrapLucideComponent(PauseIcon);
 export const IconPercent = wrapLucideComponent(PercentIcon);
+export const IconPlay = wrapLucideComponent(PlayIcon);
 export const IconSmartphone = wrapLucideComponent(SmartphoneIcon);
 export const IconTriangleAlert = wrapLucideComponent(TriangleAlertIcon);
 export const IconX = wrapLucideComponent(XIcon);
