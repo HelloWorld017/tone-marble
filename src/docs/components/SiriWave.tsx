@@ -2,6 +2,7 @@
 
 import { throttle } from 'es-toolkit';
 import { useLayoutEffect, useRef, useState } from 'react';
+import { useResponsiveIsGreaterThan } from '@/hooks/useResponsive';
 
 interface CurveState {
   phase: number;
@@ -153,6 +154,9 @@ export const SiriWave = () => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  const isDesktop = useResponsiveIsGreaterThan(768);
+  const height = isDesktop ? 400 : 300;
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   useLayoutEffect(() => {
     const ctx = canvasRef.current?.getContext('2d');
@@ -163,7 +167,7 @@ export const SiriWave = () => {
     const render = createSiriWaveRenderFn({
       ctx,
       width,
-      height: 400,
+      height,
       amplitude: 1,
       speed: 0.1,
       pixelDepth: 0.5,
@@ -179,5 +183,5 @@ export const SiriWave = () => {
     return () => cancelAnimationFrame(rafId);
   }, [width]);
 
-  return <canvas ref={canvasRef} width={width} height="400px" style={{ width: '100%' }} />;
+  return <canvas ref={canvasRef} width={width} height={`${height}px`} style={{ width: '100%' }} />;
 };

@@ -9,5 +9,6 @@ export const imageStyle = css`
 
   @media (max-width: 768px) {
     height: 300px;
+    margin-top: 100px;
   }
 `;

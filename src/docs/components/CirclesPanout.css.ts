@@ -12,10 +12,13 @@ export const circlesPanoutStyle = css`
   max-width: 1600px;
   margin: 0 auto;
   margin-top: 100px;
+  margin-bottom: -50px;
   height: 400px;
 
   @media (max-width: 768px) {
-    height: 300px;
+    height: 350px;
+    margin-top: 25px;
+    margin-bottom: -75px;
   }
 `;
 
