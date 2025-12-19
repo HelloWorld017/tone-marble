@@ -7,8 +7,8 @@ import {
 import { ChromaDetector } from './components/audio/ChromaDetector';
 import { SynthesizeMarbleProvider } from './components/audio/SynthesizeMarbleProvider';
 import { SynthesizeProvider } from './components/audio/SynthesizeProvider';
-import { SynthesizeRhythm } from './components/audio/SynthesizeRhythm';
 import { SynthesizeSFXProvider } from './components/audio/SynthesizeSFXProvider';
+import { SynthesizeSoundscape } from './components/audio/SynthesizeSoundscape';
 import { ControllerProvider } from './components/providers/ControllerProvider';
 import {
   InterfaceStateProvider,
@@ -37,7 +37,7 @@ const AppProviders = ({ children }: { children: ReactNode }) => (
             <AppSynthesizeProvider>
               <SynthesizeSFXProvider>
                 <SynthesizeMarbleProvider>
-                  <SynthesizeRhythm />
+                  <SynthesizeSoundscape />
                   {children}
                 </SynthesizeMarbleProvider>
               </SynthesizeSFXProvider>

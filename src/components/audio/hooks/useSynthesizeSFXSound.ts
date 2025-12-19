@@ -13,6 +13,9 @@ const OFF_BASE_FREQUENCY = 345;
 type SynthOpts = {
   startTime?: number;
   destination?: AudioNode;
+};
+
+type SynthButtonOpts = SynthOpts & {
   position?: Position;
   gain?: number;
 };
@@ -23,7 +26,7 @@ export const useSynthesizeSFXSound = () => {
   const pinkNoise = useMemo(() => ctx && createPinkNoiseBuffer(ctx, 3), [ctx]);
   const masterOut = useSynthesize(state => state.masterOut);
 
-  const synthesizeButton = useLatestCallback((frequency: number, opts: SynthOpts = {}) => {
+  const synthesizeButton = useLatestCallback((frequency: number, opts: SynthButtonOpts = {}) => {
     const destination = opts.destination ?? masterOut;
 
     if (!ctx || !destination) {
@@ -109,15 +112,17 @@ export const useSynthesizeSFXSound = () => {
     };
   });
 
-  const synthesizeTick = useLatestCallback((opts?: SynthOpts) => synthesizeButton(500, opts));
-  const synthesizeTock = useLatestCallback((opts?: SynthOpts) => synthesizeButton(200, opts));
+  const synthesizeTick = useLatestCallback((opts?: SynthButtonOpts) => synthesizeButton(500, opts));
+  const synthesizeTock = useLatestCallback((opts?: SynthButtonOpts) => synthesizeButton(200, opts));
 
-  const synthesizePowerOff = useLatestCallback(() => {
-    if (!ctx || !masterOut) {
+  const synthesizePowerOff = useLatestCallback((opts: SynthOpts = {}) => {
+    const destination = opts.destination ?? masterOut;
+
+    if (!ctx || !destination) {
       return;
     }
 
-    const t = ctx.currentTime;
+    const t = opts.startTime ?? ctx.currentTime;
 
     const oscOut = ctx.createGain();
     oscOut.gain.value = 0.05;
@@ -133,11 +138,11 @@ export const useSynthesizeSFXSound = () => {
     feedback.gain.setValueAtTime(0.4, t + 0.9);
     feedback.gain.linearRampToValueAtTime(0, t + 3);
 
-    sfxOut.connect(masterOut);
+    sfxOut.connect(destination);
     oscOut.connect(delay);
     delay.connect(feedback);
     feedback.connect(delay);
-    delay.connect(masterOut);
+    delay.connect(destination);
 
     [0.5, 1.0, 2.0, 2.3, 3.1, 4.2].forEach((ratio, i) => {
       const osc = ctx.createOscillator();
@@ -200,12 +205,14 @@ export const useSynthesizeSFXSound = () => {
     };
   });
 
-  const synthesizePowerOnChords = useLatestCallback(() => {
-    if (!ctx || !masterOut) {
+  const synthesizePowerOnChords = useLatestCallback((opts: SynthOpts = {}) => {
+    const destination = opts.destination ?? masterOut;
+
+    if (!ctx || !destination) {
       return;
     }
 
-    const t = ctx.currentTime + 2.3;
+    const t = opts.startTime ?? ctx.currentTime;
 
     const oscOut = ctx.createGain();
     oscOut.gain.setValueAtTime(1, t);
@@ -217,7 +224,7 @@ export const useSynthesizeSFXSound = () => {
     sweep.frequency.exponentialRampToValueAtTime(3000, t + 2);
 
     oscOut.connect(sweep);
-    sweep.connect(masterOut);
+    sweep.connect(destination);
 
     [111, 222, 332.61, 443.98, 559.39, 665.24, 880].map((frequency, index, { length }) => {
       const osc = ctx.createOscillator();
@@ -260,93 +267,97 @@ export const useSynthesizeSFXSound = () => {
     });
   });
 
-  const synthesizePowerOn = useLatestCallback(async () => {
-    if (!ctx || !masterOut) {
-      return setTimeout(() => synthesizePowerOn(), 50);
+  const synthesizePowerOn: (opts?: SynthOpts) => void = useLatestCallback(
+    async (opts: SynthOpts = {}) => {
+      const destination = opts.destination ?? masterOut;
+
+      if (!ctx || !destination) {
+        return setTimeout(() => synthesizePowerOn(opts), 50);
+      }
+
+      const {
+        reverbIn,
+        reverbOut,
+        disconnect: disconnectReverb,
+      } = await createReverbEffect(ctx, { reverbTime: 0.1 });
+
+      const output = ctx.createGain();
+      output.connect(reverbIn);
+      reverbOut.connect(destination);
+
+      const t = opts.startTime ?? ctx.currentTime;
+      synthesizeTick({ destination: output, startTime: t });
+      synthesizeTock({ destination: output, startTime: t + 0.15 });
+      synthesizeTick({ destination: output, startTime: t + 0.3 });
+
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.value = 0;
+      noiseGain.gain.setValueAtTime(0, t + 0.2);
+      noiseGain.gain.linearRampToValueAtTime(1, t + 1.7);
+      noiseGain.gain.setValueAtTime(1, t + 2);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 2.4);
+      noiseGain.gain.linearRampToValueAtTime(0, t + 2.41);
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = pinkNoise;
+
+      const lpf = ctx.createBiquadFilter();
+      lpf.type = 'lowpass';
+      lpf.Q.value = 30;
+      lpf.frequency.setValueAtTime(20, t);
+      lpf.frequency.linearRampToValueAtTime(150, t + 2.5);
+
+      const bpf = ctx.createBiquadFilter();
+      bpf.type = 'bandpass';
+      bpf.Q.value = 50;
+      bpf.frequency.setValueAtTime(2000, t);
+      bpf.frequency.linearRampToValueAtTime(2500, t + 2.5);
+
+      const bpfGain = ctx.createGain();
+      bpfGain.gain.value = 0;
+      bpfGain.gain.setValueAtTime(0.2, t);
+      bpfGain.gain.exponentialRampToValueAtTime(0.8, t + 2.5);
+
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(2000, t);
+      osc.frequency.linearRampToValueAtTime(2500, t + 2.5);
+
+      const oscGain = ctx.createGain();
+      oscGain.gain.value = 0;
+      oscGain.gain.setValueAtTime(0, t + 0.2);
+      oscGain.gain.linearRampToValueAtTime(0.01, t + 2);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, t + 2.4);
+      oscGain.gain.linearRampToValueAtTime(0, t + 2.41);
+
+      osc.connect(oscGain);
+      oscGain.connect(output);
+      noise.connect(noiseGain);
+      noiseGain.connect(lpf);
+      noiseGain.connect(bpf);
+      lpf.connect(output);
+      bpf.connect(bpfGain);
+      bpfGain.connect(output);
+
+      noise.start(t + 0.2);
+      noise.stop(t + 2.5);
+      osc.start(t + 0.2);
+      osc.stop(t + 2.5);
+      osc.onended = () => {
+        disconnectReverb();
+        osc.disconnect();
+        oscGain.disconnect();
+        noise.disconnect();
+        noiseGain.disconnect();
+        lpf.disconnect();
+        bpf.disconnect();
+        bpfGain.disconnect();
+        output.disconnect();
+      };
+
+      synthesizePowerOnChords({ ...opts, startTime: t + 2.3 });
     }
-
-    const {
-      reverbIn,
-      reverbOut,
-      disconnect: disconnectReverb,
-    } = await createReverbEffect(ctx, { reverbTime: 0.1 });
-
-    const output = ctx.createGain();
-    output.connect(reverbIn);
-    reverbOut.connect(masterOut);
-
-    const t = ctx.currentTime;
-    synthesizeTick({ destination: output, startTime: t });
-    synthesizeTock({ destination: output, startTime: t + 0.15 });
-    synthesizeTick({ destination: output, startTime: t + 0.3 });
-
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.value = 0;
-    noiseGain.gain.setValueAtTime(0, t + 0.2);
-    noiseGain.gain.linearRampToValueAtTime(1, t + 1.7);
-    noiseGain.gain.setValueAtTime(1, t + 2);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 2.4);
-    noiseGain.gain.linearRampToValueAtTime(0, t + 2.41);
-
-    const noise = ctx.createBufferSource();
-    noise.buffer = pinkNoise;
-
-    const lpf = ctx.createBiquadFilter();
-    lpf.type = 'lowpass';
-    lpf.Q.value = 30;
-    lpf.frequency.setValueAtTime(20, t);
-    lpf.frequency.linearRampToValueAtTime(150, t + 2.5);
-
-    const bpf = ctx.createBiquadFilter();
-    bpf.type = 'bandpass';
-    bpf.Q.value = 50;
-    bpf.frequency.setValueAtTime(2000, t);
-    bpf.frequency.linearRampToValueAtTime(2500, t + 2.5);
-
-    const bpfGain = ctx.createGain();
-    bpfGain.gain.value = 0;
-    bpfGain.gain.setValueAtTime(0.2, t);
-    bpfGain.gain.exponentialRampToValueAtTime(0.8, t + 2.5);
-
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(2000, t);
-    osc.frequency.linearRampToValueAtTime(2500, t + 2.5);
-
-    const oscGain = ctx.createGain();
-    oscGain.gain.value = 0;
-    oscGain.gain.setValueAtTime(0, t + 0.2);
-    oscGain.gain.linearRampToValueAtTime(0.01, t + 2);
-    oscGain.gain.exponentialRampToValueAtTime(0.001, t + 2.4);
-    oscGain.gain.linearRampToValueAtTime(0, t + 2.41);
-
-    osc.connect(oscGain);
-    oscGain.connect(output);
-    noise.connect(noiseGain);
-    noiseGain.connect(lpf);
-    noiseGain.connect(bpf);
-    lpf.connect(output);
-    bpf.connect(bpfGain);
-    bpfGain.connect(output);
-
-    noise.start(t + 0.2);
-    noise.stop(t + 2.5);
-    osc.start(t + 0.2);
-    osc.stop(t + 2.5);
-    osc.onended = () => {
-      disconnectReverb();
-      osc.disconnect();
-      oscGain.disconnect();
-      noise.disconnect();
-      noiseGain.disconnect();
-      lpf.disconnect();
-      bpf.disconnect();
-      bpfGain.disconnect();
-      output.disconnect();
-    };
-
-    synthesizePowerOnChords();
-  });
+  );
 
   return {
     synthesizeTick,

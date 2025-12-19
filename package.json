@@ -46,6 +46,7 @@
     "@react-three/rapier": "^2.2.0",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-backend-webgpu": "^4.22.0",
+    "@use-gesture/react": "^10.3.1",
     "es-toolkit": "^1.42.0",
     "lucide-react": "^0.561.0",
     "peerjs": "^1.5.5",

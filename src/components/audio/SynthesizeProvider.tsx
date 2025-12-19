@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
 import { useAudioContext } from './AudioContextProvider';
@@ -9,8 +9,6 @@ import type { Position } from '@/types/Position';
 
 export const [SynthesizeProvider, useSynthesize] = buildContext(
   ({ gain = 1 }: { gain?: number }) => {
-    const listenerPosition = useRef<Position>([0, 0, 0]);
-
     const ctx = useAudioContext();
     const additionalGain = useGain({ gain: 1 }, ctx?.destination);
     useEffect(() => {
@@ -46,18 +44,16 @@ export const [SynthesizeProvider, useSynthesize] = buildContext(
         return;
       }
 
-      listenerPosition.current = position;
       ctx.listener.positionX.value = position[0];
       ctx.listener.positionY.value = position[1];
       ctx.listener.positionZ.value = position[2];
     });
 
     const calculateEffectiveGain = useLatestCallback((gain: number, origin: Position) => {
-      const listener = listenerPosition.current;
       const distance = Math.hypot(
-        origin[0] - listener[0],
-        origin[1] - listener[1],
-        origin[2] - listener[2]
+        origin[0] - (ctx?.listener.positionX.value ?? 0),
+        origin[1] - (ctx?.listener.positionY.value ?? 0),
+        origin[2] - (ctx?.listener.positionZ.value ?? 0)
       );
       const attenuation = 1 / (1 + distance);
       return gain * attenuation;

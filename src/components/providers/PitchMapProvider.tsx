@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { POINTER_ADVANCE, RECORD_SIZE } from '@/constants';
 import { useLatestCallback } from '@/hooks/useLatestCallback';
 import { buildContext } from '@/utils/context';
+import { chromaToPitch } from '../audio/utils/chromaToPitch';
 import { useInterfaceState } from './InterfaceStateProvider';
 
 const TEXTURE_SIZE = 512;
@@ -54,7 +55,7 @@ export const [PitchMapProvider, usePitchMap] = buildContext(() => {
         ? latestPendingChroma.current
         : chromaMap[~~pointer.current];
 
-    return 440 * Math.pow(2, (chroma + 48 - 69) / 12);
+    return chromaToPitch(chroma);
   });
 
   const [pitchTexture, setPitchTexture] = useState<HTMLCanvasElement | null>(null);

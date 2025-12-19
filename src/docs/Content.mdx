@@ -4,12 +4,13 @@ import { CirclesPanout } from './components/CirclesPanout';
 import { Footer } from './components/Footer';
 import { FullWidthImage } from './components/FullWidthImage';
 import { SiriWave } from './components/SiriWave';
+import { SoundGallery } from './components/SoundGallery';
 import { MotivationImages } from './components/MotivationImages'
 
 <section>
   # TM-07 <span>: An unrealistic instrument</span>
 
-  <a class="cta" href="../">Try it now</a>
+  <a className="cta" href="../">Try it now</a>
 </section>
 
 <section>
@@ -21,7 +22,7 @@ import { MotivationImages } from './components/MotivationImages'
 </section>
 
 <br />
-<FullWidthImage class="main-image" src={ImageToneMarbleMain} />
+<FullWidthImage className="main-image" src={ImageToneMarbleMain} />
 
 <section>
   ## <i>02</i> Kinetic Synthesis Engine <span>_ The physics of sound, visualized and heard.</span>
@@ -107,6 +108,14 @@ Time flows when the marbles collide, and the speed of that flow determines the b
 
 You can customize the timbre assigned to each pillar and adjust the intensity of the resulting background noise.
 
+### Sound Gallery
+Sounds used in this project are all synthesized using WebAudio and no audio clips are used.  
+You can hear some of them here:
+
+</section>
+<SoundGallery />
+<section>
+
 ### Technical Details
 The TM-07 consists of five layers:
 <img src={ImageTM07Structure} alt="Layers" />
@@ -120,6 +129,7 @@ The TM-07 consists of five layers:
   Three synthesizers implemented in WebAudio: `Wind`, `Glass` and `Sand`.
   These utilize additive & subtractive synthesis.  
   Synthesizers for `Lo-Fi Vinyl Scratch`, `Kick & Hi-hat`, and `Power Turn On/Off` are also implemented.
+  No audio clips are used in this project.
 
 * **Controller Layer**  
   Smartphone's motion data is sent directly to the laptop via WebRTC.
@@ -135,30 +145,30 @@ The TM-07 consists of five layers:
 
 This project took 7 happy days and 3 crunch days.
 
-<div class="twocols">
+<div className="twocols">
   <div>
     **Used Web APIs**  
 
-    <div class="taglist">`WebAudio` `WebGL` `WebGPU` `WebMIDI` `WebRTC`</div>
+    <span className="taglist">`WebAudio` `WebGL` `WebGPU` `WebMIDI` `WebRTC`</span>
   </div>
   <div>
     **Used Libraries**
     * **UI**  
-      <div class="taglist">`react` `react-three` `react-spring` `emotion`</div>
+      <span className="taglist">`react` `react-three` `react-spring` `emotion`</span>
 
     * **NeuralNets**  
-      <div class="taglist">`tensorflowjs`</div>
+      <span className="taglist">`tensorflowjs`</span>
 
     * **WebRTC**  
-      <div class="taglist">`peerjs`</div>
+      <span className="taglist">`peerjs`</span>
   </div>
 </div>
 
 ### Aesthetics / Fun / Attractive Aspects
 Why don't you experience it firsthand?
 
-<a class="cta" href="../">Try it now</a>  
-<a class="cta secondary" href="https://github.com/HelloWorld017/tone-marble">Source Code</a>  
+<a className="cta" href="../">Try it now</a>  
+<a className="cta secondary" href="https://github.com/HelloWorld017/tone-marble">Source Code</a>  
 
 <br />
 

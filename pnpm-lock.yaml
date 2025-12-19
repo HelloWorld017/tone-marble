@@ -38,6 +38,9 @@ importers:
       '@tensorflow/tfjs-backend-webgpu':
         specifier: ^4.22.0
         version: 4.22.0(@tensorflow/tfjs-core@4.22.0)
+      '@use-gesture/react':
+        specifier: ^10.3.1
+        version: 10.3.1(react@19.2.1)
       es-toolkit:
         specifier: ^1.42.0
         version: 1.42.0

@@ -32,7 +32,7 @@ export const CasePower = ({ nodes, materials }: Pick<GLTFResult, 'nodes' | 'mate
   const synthesizePowerOff = useSynthesizeSFX(state => state.synthesizePowerOff);
   const togglePowerUpDown = useLatestCallback(() => {
     if (!isPoweredOnInternal) {
-      synthesizePowerOn().catch(() => {});
+      synthesizePowerOn();
     } else {
       synthesizePowerOff();
     }

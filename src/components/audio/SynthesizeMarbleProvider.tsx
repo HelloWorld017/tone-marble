@@ -5,10 +5,10 @@ import { useInterfaceState } from '../providers/InterfaceStateProvider';
 import { usePitchMap } from '../providers/PitchMapProvider';
 import { useSynthesize } from './SynthesizeProvider';
 import { useSynthesizeMarbleSound } from './hooks/useSynthesizeMarbleSound';
+import { getRandomHarmonicPitch } from './utils/getRandomHarmonicPitch';
 import type { Position } from '@/types/Position';
 
 const MAX_VOICES = 100;
-const HARMONIC_RATIOS = [0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0];
 
 /*
  * Utilities
@@ -28,12 +28,6 @@ const shouldPlay = (activeVoices: number, effectiveGain: number) => {
   }
 
   return effectiveGain >= 0.001;
-};
-
-const getRandomFrequency = (baseFrequency: number) => {
-  const ratio = HARMONIC_RATIOS[~~(Math.random() * HARMONIC_RATIOS.length)];
-  const detune = 1 + (Math.random() * 0.01 - 0.005);
-  return baseFrequency * ratio * detune;
 };
 
 /*
@@ -74,7 +68,7 @@ export const [SynthesizeMarbleProvider, useSynthesizeMarble] = buildContext(() =
       return;
     }
 
-    const frequency = getRandomFrequency(readPitch());
+    const frequency = getRandomHarmonicPitch(readPitch());
     activeSynthes[~~(Math.random() * activeSynthes.length)]({ position, gain, frequency });
   });
 

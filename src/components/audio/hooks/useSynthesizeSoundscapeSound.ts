@@ -13,7 +13,7 @@ import { useGain } from './useGain';
 const WHITENOISE_BUFFER_SIZE = 2;
 const PINKNOISE_BUFFER_SIZE = 10;
 
-export const useSynthesizeRhythmSound = () => {
+export const useSynthesizeSoundscapeSound = () => {
   const destinationOut = useSynthesize(state => state.destinationOut);
   const analyzerOut = useSynthesize(state => state.analyzerOut);
 
@@ -26,7 +26,7 @@ export const useSynthesizeRhythmSound = () => {
   );
 
   /* Lo-Fi Vinyl Scratch Synthesizer */
-  const loFiOut = useGain({ gain: 1 }, analyzerOut);
+  const loFiOut = useGain({ gain: 0 }, analyzerOut);
   useConnectNode(loFiOut, destinationOut);
 
   const hissGain = useGain({ gain: 0.01 }, loFiOut);
@@ -59,7 +59,7 @@ export const useSynthesizeRhythmSound = () => {
   useConnectNode(crakle, crakleGain);
 
   /* Kick and Hi-Hat Synthesizer */
-  const rhythmOut = useGain({ gain: 1 }, analyzerOut);
+  const rhythmOut = useGain({ gain: 0 }, analyzerOut);
   useConnectNode(rhythmOut, destinationOut);
 
   const synthesizeKick = useLatestCallback(() => {

@@ -3,11 +3,11 @@ import { useLatestRef } from '@/hooks/useLatestRef';
 import { useInterfaceState } from '../providers/InterfaceStateProvider';
 import { usePitchMap } from '../providers/PitchMapProvider';
 import { useAudioContext } from './AudioContextProvider';
-import { useSynthesizeRhythmSound } from './hooks/useSynthesizeRhythmSound';
+import { useSynthesizeSoundscapeSound } from './hooks/useSynthesizeSoundscapeSound';
 
-export const SynthesizeRhythm = () => {
+export const SynthesizeSoundscape = () => {
   const effectiveSpeed = usePitchMap(state => state.effectiveSpeed);
-  const { synthesizeRhythm, loFiOut, rhythmOut } = useSynthesizeRhythmSound();
+  const { synthesizeRhythm, loFiOut, rhythmOut } = useSynthesizeSoundscapeSound();
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
