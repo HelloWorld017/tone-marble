@@ -27,7 +27,7 @@ export const contentStyle = (theme: Theme) => css`
 
     @media (max-width: 768px) {
       padding: 0 16px;
-      padding-top: 150px;
+      padding-top: 100px;
     }
   }
 
@@ -85,6 +85,16 @@ export const contentStyle = (theme: Theme) => css`
       font-weight: 400;
       color: ${theme.colors.fillSecondary};
     }
+
+    @media (max-width: 768px) {
+      font-size: 8.4rem;
+      line-height: 9.6rem;
+
+      & > span {
+        font-size: 4rem;
+        line-height: 4.8rem;
+      }
+    }
   }
 
   h2 {
@@ -109,6 +119,21 @@ export const contentStyle = (theme: Theme) => css`
       line-height: 3.4rem;
       font-weight: 400;
       color: ${theme.colors.fillSecondary};
+    }
+
+    @media (max-width: 768px) {
+      font-size: 4rem;
+      line-height: 4.8rem;
+
+      & > i {
+        font-size: 7.2rem;
+        line-height: 8.4rem;
+      }
+
+      & > span {
+        font-size: 3rem;
+        line-height: 3.6rem;
+      }
     }
   }
 

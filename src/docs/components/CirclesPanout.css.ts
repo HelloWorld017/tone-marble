@@ -13,13 +13,22 @@ export const circlesPanoutStyle = css`
   margin: 0 auto;
   margin-top: 100px;
   height: 400px;
+
+  @media (max-width: 768px) {
+    height: 300px;
+  }
 `;
 
 export const circleStyle = (theme: Theme) => css`
   position: absolute;
-  left: 0;
+  left: 1.6rem;
   border: 1rem solid ${theme.colors.fillSecondary};
   width: 300px;
   height: 300px;
   border-radius: 150px;
+
+  @media (max-width: 768px) {
+    width: 200px;
+    height: 200px;
+  }
 `;

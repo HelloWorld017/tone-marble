@@ -6,6 +6,10 @@ export const rootStyle = css`
 
   & + section {
     padding-top: 30px;
+
+    @media (max-width: 768px) {
+      padding-top: 20px;
+    }
   }
 `;
 
@@ -20,6 +24,10 @@ export const gallerySectionStyle = css`
     padding-top: 30px;
     padding-bottom: 1px;
     ${galleryWrapperStyle};
+
+    @media (max-width: 768px) {
+      padding-top: 20px;
+    }
   }
 `;
 
@@ -29,6 +37,10 @@ export const galleryContainerStyle = (theme: Theme) => css`
   border: 1px solid ${theme.colors.fillLine};
   padding: 3rem;
   touch-action: pan-y;
+
+  @media (max-width: 768px) {
+    padding: 2rem;
+  }
 `;
 
 export const galleryStyle = css`
@@ -39,11 +51,19 @@ export const galleryStyle = css`
 export const buttonStyle = css`
   cursor: pointer;
   position: relative;
-  width: 20rem;
-  height: 20rem;
+  aspect-ratio: 1 / 1;
   border-radius: 2rem;
   overflow: hidden;
   flex: 0 0 auto;
+
+  & > img {
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 768px) {
+    border-radius: 1.5rem;
+  }
 `;
 
 export const buttonPauseStyle = (isActive: boolean) => (theme: Theme) => css`

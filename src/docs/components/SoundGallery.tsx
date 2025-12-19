@@ -11,6 +11,7 @@ import { useSynthesizeSFXSound } from '@/components/audio/hooks/useSynthesizeSFX
 import { useSynthesizeSoundscapeSound } from '@/components/audio/hooks/useSynthesizeSoundscapeSound';
 import { chromaToPitch } from '@/components/audio/utils/chromaToPitch';
 import { getRandomHarmonicPitch } from '@/components/audio/utils/getRandomHarmonicPitch';
+import { useResponsiveIsGreaterThan } from '@/hooks/useResponsive';
 import { cltRandom } from '@/utils/random';
 import CoverButtons from '../assets/images/cover-buttons.png';
 import CoverGlass from '../assets/images/cover-glass.png';
@@ -199,9 +200,10 @@ export const SoundGallery = () => {
     [toggleSound]
   );
 
+  const isDesktop = useResponsiveIsGreaterThan(768);
   const { containerRef, gestureRef, getStyle } = usePiledScroll({
     itemCount: items.length,
-    itemWidth: 200,
+    itemWidth: isDesktop ? 200 : 150,
     gap: 5,
   });
 

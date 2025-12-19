@@ -46,23 +46,46 @@ export const usePiledScroll = ({ itemCount, itemWidth, gap }: UsePiledScrollProp
 
   const x = useSpringValue(0);
   const inertia = useSpringValue(0);
-  const resetXDebounced = useMemo(() => debounce(() => inertia.start(0), 500), []);
+  const resetInertiaDebounced = useMemo(() => debounce(() => inertia.start(0), 500), []);
 
   const gestureRef = useRef<HTMLDivElement>(null);
-  const bind = useGesture(
+  useGesture(
     {
-      onDrag: ({ offset: [offsetX], velocity: [velocityX], active }) => {
+      onDrag: ({
+        offset: [offsetX],
+        velocity: [velocityX],
+        direction: [directionX],
+        active,
+        last,
+      }) => {
+        if (last) {
+          const config = { tension: 100, friction: 20 };
+          const targetX = Math.max(
+            0,
+            Math.min(-(offsetX + velocityX * directionX * 250), maxScroll)
+          );
+          void x.start(targetX, { config: { ...config, velocity: -velocityX * directionX } });
+          void inertia.start(0, { config });
+          return;
+        }
+
         void x.start(-offsetX, { immediate: active });
         void inertia.start(active ? Math.max(-20, Math.min(velocityX * 20, 20)) : 0);
       },
-      onWheel: ({ event, offset: [, offsetY], velocity: [, velocityY], active }) => {
+      onWheel: ({
+        event,
+        offset: [, offsetY],
+        velocity: [, velocityY],
+        direction: [, directionY],
+        active,
+      }) => {
         if (event.cancelable) {
           event.preventDefault();
         }
 
         void x.start(offsetY);
-        void inertia.start(active ? Math.max(-20, Math.min(velocityY * 20, 20)) : 0);
-        resetXDebounced();
+        void inertia.start(active ? Math.max(-20, Math.min(velocityY * directionY * 20, 20)) : 0);
+        resetInertiaDebounced();
       },
     },
     {
